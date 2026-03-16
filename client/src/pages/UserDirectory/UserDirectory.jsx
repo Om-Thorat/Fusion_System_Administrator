@@ -16,87 +16,73 @@ import {
   Paper,
   Center,
   Divider,
+  useMantineColorScheme,
 } from "@mantine/core";
 import { debounce } from "lodash";
 import { VariableSizeList as List } from "react-window";
 import { fetchUsersByType } from "../../api/Users.jsx";
 
-const InfoCard = React.memo(({ person }) => (
-  <Card
-    shadow="sm"
-    radius="xl"
-    withBorder
-    p="lg"
-    style={{
-      borderColor: "#e0e0e0",
-      backgroundColor: "#fdfdfd",
-      transition: "background-color 0.2s ease",
-    }}
-    className="info-card"
-    onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = "#f2f2f2")}
-    onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = "#fdfdfd")}
-  >
-    <Text fw={600} size="lg" mb="xs">
-      {person.full_name}
-    </Text>
-    <Text size="sm" c="dimmed">
-      <strong>Username:</strong> {person.username}
-    </Text>
+const InfoCard = React.memo(({ person }) => {
+  const { colorScheme } = useMantineColorScheme();
+  const isDark = colorScheme === "dark";
+  return (
+    <Card
+      shadow="sm"
+      radius="xl"
+      withBorder
+      p="lg"
+      style={{
+        borderColor: isDark ? "#444" : "#e0e0e0",
+        backgroundColor: isDark ? "#2c2e33" : "#fdfdfd",
+        color: isDark ? "#fff" : "#000",
+        transition: "background-color 0.2s ease",
+      }}
+      className="info-card"
+      onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = isDark ? "#373a40" : "#f2f2f2")}
+      onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = isDark ? "#2c2e33" : "#fdfdfd")}
+    >
+      <Text fw={600} size="lg" mb="xs" style={{ color: isDark ? "#fff" : "#000" }}>
+        {person.full_name}
+      </Text>
+      <Text size="sm" c="dimmed">
+        <strong>Username:</strong> {person.username}
+      </Text>
 
-    {person.user_type === "student" && (
-      <>
-        <Divider my="sm" />
-        <Text size="sm">
-          <strong>Programme:</strong> {person.programme}
-        </Text>
-        <Text size="sm">
-          <strong>Discipline:</strong> {person.discipline}
-        </Text>
-        <Text size="sm">
-          <strong>Batch:</strong> {person.batch}
-        </Text>
-        <Text size="sm">
-          <strong>Semester:</strong> {person.curr_semester_no}
-        </Text>
-        <Text size="sm">
-          <strong>Category:</strong> {person.category}
-        </Text>
-        <Text size="sm">
-          <strong>Gender:</strong> {person.gender}
-        </Text>
-      </>
-    )}
+      {person.user_type === "student" && (
+        <>
+          <Divider my="sm" />
+          <Text size="sm" style={{ color: isDark ? "#ccc" : "#000" }}><strong>Programme:</strong> {person.programme}</Text>
+          <Text size="sm" style={{ color: isDark ? "#ccc" : "#000" }}><strong>Discipline:</strong> {person.discipline}</Text>
+          <Text size="sm" style={{ color: isDark ? "#ccc" : "#000" }}><strong>Batch:</strong> {person.batch}</Text>
+          <Text size="sm" style={{ color: isDark ? "#ccc" : "#000" }}><strong>Semester:</strong> {person.curr_semester_no}</Text>
+          <Text size="sm" style={{ color: isDark ? "#ccc" : "#000" }}><strong>Category:</strong> {person.category}</Text>
+          <Text size="sm" style={{ color: isDark ? "#ccc" : "#000" }}><strong>Gender:</strong> {person.gender}</Text>
+        </>
+      )}
 
-    {person.user_type === "staff" && (
-      <>
-        <Divider my="sm" />
-        <Text size="sm">
-          <strong>Gender:</strong> {person.gender}
-        </Text>
-      </>
-    )}
+      {person.user_type === "staff" && (
+        <>
+          <Divider my="sm" />
+          <Text size="sm" style={{ color: isDark ? "#ccc" : "#000" }}><strong>Gender:</strong> {person.gender}</Text>
+        </>
+      )}
 
-    {person.user_type === "faculty" && (
-      <>
-        <Divider my="sm" />
-        <Text size="sm">
-          <strong>Department:</strong> {person.department}
-        </Text>
-        <Text size="sm">
-          <strong>Gender:</strong> {person.gender}
-        </Text>
-        <Text size="sm" mb="xs">
-          <strong>Designations:</strong>
-        </Text>
-        {person.designations.map((role, idx) => (
-          <Badge key={idx} color="indigo" variant="light" radius="md" mr={5}>
-            {role}
-          </Badge>
-        ))}
-      </>
-    )}
-  </Card>
-));
+      {person.user_type === "faculty" && (
+        <>
+          <Divider my="sm" />
+          <Text size="sm" style={{ color: isDark ? "#ccc" : "#000" }}><strong>Department:</strong> {person.department}</Text>
+          <Text size="sm" style={{ color: isDark ? "#ccc" : "#000" }}><strong>Gender:</strong> {person.gender}</Text>
+          <Text size="sm" mb="xs" style={{ color: isDark ? "#ccc" : "#000" }}><strong>Designations:</strong></Text>
+          {person.designations.map((role, idx) => (
+            <Badge key={idx} color="indigo" variant="light" radius="md" mr={5}>
+              {role}
+            </Badge>
+          ))}
+        </>
+      )}
+    </Card>
+  );
+});
 
 const extractUnique = (arr, key) => [
   ...new Set(

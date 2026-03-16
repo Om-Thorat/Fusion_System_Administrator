@@ -3,7 +3,7 @@ import {
     Tabs, Card, Text, ScrollArea, Container, Title,
     Flex, Button, TextInput, MultiSelect, Grid, Loader,
     Paper, Center, Divider, Checkbox, Group,
-    rem, Modal
+    rem, Modal, useMantineColorScheme
 } from "@mantine/core";
 import { debounce } from "lodash";
 import { showNotification } from "@mantine/notifications";
@@ -131,30 +131,37 @@ const STATIC_STUDENTS = [
         gender: "male"
     }
 ];
-const InfoCard = ({ person, selectable, selected, onSelectChange }) => (
-    <Card shadow="sm" radius="xl" withBorder p="lg" style={{ backgroundColor: "#fdfdfd" }}>
-        <Group position="apart" align="flex-start">
-            <div style={{ flex: 1 }}>
-                <Text fw={600} size="lg" mb="xs">{person.full_name}</Text>
-                <Text size="sm" c="dimmed"><strong>Username:</strong> {person.username}</Text>
-                <Divider my="sm" />
-                <Text size="sm"><strong>Programme:</strong> {person.programme}</Text>
-                <Text size="sm"><strong>Discipline:</strong> {person.discipline}</Text>
-                <Text size="sm"><strong>Batch:</strong> {person.batch}</Text>
-                <Text size="sm"><strong>Semester:</strong> {person.curr_semester_no}</Text>
-                <Text size="sm"><strong>Category:</strong> {person.category}</Text>
-                <Text size="sm"><strong>Gender:</strong> {person.gender}</Text>
-            </div>
-            {selectable && (
-                <Checkbox
-                    checked={selected}
-                    onChange={() => onSelectChange(person.username)}
-                    mt="sm"
-                />
-            )}
-        </Group>
-    </Card>
-);
+const InfoCard = ({ person, selectable, selected, onSelectChange }) => {
+    const { colorScheme } = useMantineColorScheme();
+    const isDark = colorScheme === "dark";
+    return (
+        <Card shadow="sm" radius="xl" withBorder p="lg" style={{
+            backgroundColor: isDark ? "#2c2e33" : "#fdfdfd",
+            color: isDark ? "#fff" : "#000"
+        }}>
+            <Group position="apart" align="flex-start">
+                <div style={{ flex: 1 }}>
+                    <Text fw={600} size="lg" mb="xs" style={{ color: isDark ? "#fff" : "#000" }}>{person.full_name}</Text>
+                    <Text size="sm" c="dimmed"><strong>Username:</strong> {person.username}</Text>
+                    <Divider my="sm" />
+                    <Text size="sm" style={{ color: isDark ? "#ccc" : "#000" }}><strong>Programme:</strong> {person.programme}</Text>
+                    <Text size="sm" style={{ color: isDark ? "#ccc" : "#000" }}><strong>Discipline:</strong> {person.discipline}</Text>
+                    <Text size="sm" style={{ color: isDark ? "#ccc" : "#000" }}><strong>Batch:</strong> {person.batch}</Text>
+                    <Text size="sm" style={{ color: isDark ? "#ccc" : "#000" }}><strong>Semester:</strong> {person.curr_semester_no}</Text>
+                    <Text size="sm" style={{ color: isDark ? "#ccc" : "#000" }}><strong>Category:</strong> {person.category}</Text>
+                    <Text size="sm" style={{ color: isDark ? "#ccc" : "#000" }}><strong>Gender:</strong> {person.gender}</Text>
+                </div>
+                {selectable && (
+                    <Checkbox
+                        checked={selected}
+                        onChange={() => onSelectChange(person.username)}
+                        mt="sm"
+                    />
+                )}
+            </Group>
+        </Card>
+    );
+};
 
 const extractUnique = (arr, key) =>
     [...new Set(arr.map((item) => key === "semester"

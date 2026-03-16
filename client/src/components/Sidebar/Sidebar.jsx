@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { FaMoon, FaSun } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import { useMediaQuery } from "@mantine/hooks";
 import {
@@ -25,7 +26,7 @@ const MANTINE_DARK_BLUE = "#1c7ed6";
 const LOGOUT_RED = "#d63031";
 const LOGOUT_DARK_RED = "#b71c1c";
 
-const Sidebar = () => {
+const Sidebar = ({ toggleColorScheme, colorScheme }) => {
   const navigate = useNavigate();
   const isSmallScreen = useMediaQuery("(max-width: 768px)");
   const [hovered, setHovered] = useState(null);
@@ -136,6 +137,13 @@ const Sidebar = () => {
         },
       ],
     },
+    {
+  label: "Toggle Theme",
+  icon: colorScheme === "dark" ? <FaSun size={24} /> : <FaMoon size={24} />,
+  height: "10%",
+  isPrimary: false,
+  action: toggleColorScheme,
+    },
   ];
 
   return (
@@ -149,7 +157,7 @@ const Sidebar = () => {
           top: 0,
           height: "100vh",
           width: isSmallScreen ? "60px" : "80px",
-          backgroundColor: "#ffffff",
+         backgroundColor: colorScheme === "dark" ? "#1a1b1e" : "#ffffff",
           boxShadow: "-3px 0 10px rgba(0, 0, 0, 0.1)",
         }}
       >
