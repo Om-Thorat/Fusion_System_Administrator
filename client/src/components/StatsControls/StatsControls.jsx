@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import dayjs from 'dayjs';
-import { UnstyledButton, Text, Paper, Group, rem } from '@mantine/core';
+import { UnstyledButton, Text, Paper, Group, rem, useMantineColorScheme } from '@mantine/core';
 import {
     FaUserCheck,
     FaArchive,
@@ -17,17 +17,30 @@ const data = [
 ];
 
 export function StatsControls() {
+    const { colorScheme } = useMantineColorScheme();
+    const isDark = colorScheme === "dark";
     const [date, setDate] = useState(new Date(2024, 9, 11));
 
     const stats = data.map((stat) => (
-        <Paper className={classes.stat} radius="md" shadow="md" p="xs" key={stat.label}>
+        <Paper 
+            className={classes.stat} 
+            radius="md" 
+            shadow="md" 
+            p="xs" 
+            key={stat.label}
+            style={{
+                backgroundColor: isDark ? '#2c2e33' : undefined,
+                borderColor: isDark ? '#444' : undefined,
+                color: isDark ? '#fff' : undefined
+            }}
+        >
             <stat.icon
-                style={{ width: rem(32), height: rem(32) }}
+                style={{ width: rem(32), height: rem(32), color: isDark ? '#fff' : undefined }}
                 className={classes.icon}
             />
             <div>
-                <Text fz="sm" className={classes.label}>{stat.label}</Text>
-                <Text fz="xl" className={classes.count}>
+                <Text fz="sm" className={classes.label} style={{ color: isDark ? '#ccc' : undefined }}>{stat.label}</Text>
+                <Text fz="xl" className={classes.count} style={{ color: isDark ? '#fff' : undefined }}>
                     <span className={classes.value}>{Math.floor(Math.random() * 6 + 4)}</span>
                 </Text>
             </div>
@@ -42,14 +55,14 @@ export function StatsControls() {
                     onClick={() => setDate((current) => dayjs(current).add(1, 'day').toDate())}
                 >
                     <FaChevronUp
-                        style={{ width: rem(16), height: rem(16) }}
+                        style={{ width: rem(16), height: rem(16), color: isDark ? '#fff' : undefined }}
                         className={classes.controlIcon}
                     />
                 </UnstyledButton>
 
                 <div className={classes.date}>
-                    <Text className={classes.day}>{dayjs(date).format('DD')}</Text>
-                    <Text className={classes.month}>{dayjs(date).format('MMMM')}</Text>
+                    <Text className={classes.day} style={{ color: isDark ? '#fff' : undefined }}>{dayjs(date).format('DD')}</Text>
+                    <Text className={classes.month} style={{ color: isDark ? '#ccc' : undefined }}>{dayjs(date).format('MMMM')}</Text>
                 </div>
 
                 <UnstyledButton
@@ -57,7 +70,7 @@ export function StatsControls() {
                     onClick={() => setDate((current) => dayjs(current).subtract(1, 'day').toDate())}
                 >
                     <FaChevronDown
-                        style={{ width: rem(16), height: rem(16) }}
+                        style={{ width: rem(16), height: rem(16), color: isDark ? '#fff' : undefined }}
                         className={classes.controlIcon}
                     />
                 </UnstyledButton>

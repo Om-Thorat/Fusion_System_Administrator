@@ -184,6 +184,8 @@ const filterAndSearch = (data, filters, searchQuery) =>
     });
 
 const ArchiveStudentPage = () => {
+    const { colorScheme } = useMantineColorScheme();
+    const isDark = colorScheme === "dark";
     const checkIcon = <FaCheck style={{ width: rem(20), height: rem(20) }} />;
 
     const [activeTab, setActiveTab] = useState("archive");
@@ -236,7 +238,7 @@ const ArchiveStudentPage = () => {
     };
 
     return (
-        <Container size="lg" py="xl">
+        <Container size="lg" py="xl" style={{ backgroundColor: isDark ? '#1a1b1e' : '#f7f7f7', minHeight: '100vh' }}>
             <Flex
                 direction={{ base: 'column', sm: 'row' }}
                 gap={{ base: 'sm', sm: 'lg' }}
@@ -256,7 +258,7 @@ const ArchiveStudentPage = () => {
                 </Button>
             </Flex>
 
-            <Paper shadow="lg" p="xl" radius="xl" withBorder>
+            <Paper shadow="lg" p="xl" radius="xl" withBorder style={{ backgroundColor: isDark ? '#2c2e33' : '#fff', borderColor: isDark ? '#444' : '#e0e0e0' }}>
                 <Tabs value={activeTab} onChange={setActiveTab} variant="pills" color="blue" radius="lg" keepMounted={false}>
                     <Tabs.List grow mb="lg">
                         <Tabs.Tab value="archive">ARCHIVE</Tabs.Tab>

@@ -16,6 +16,7 @@ import {
   Paper,
   Stack,
   FileInput,
+  useMantineColorScheme,
 } from "@mantine/core";
 import { FaCheck, FaDiceD6, FaTimes } from "react-icons/fa";
 import { notifications, showNotification } from "@mantine/notifications";
@@ -25,6 +26,9 @@ import { getAllDepartments, getAllBatches } from '../../api/Roles';
 import { createStudent, bulkUploadUsers, downloadSampleCSV } from "../../api/Users";
 
 const StudentCreationPage = () => {
+  const { colorScheme } = useMantineColorScheme();
+  const isDark = colorScheme === "dark";
+  
   const xIcon = <FaTimes style={{ width: rem(20), height: rem(20) }} />;
   const checkIcon = <FaCheck style={{ width: rem(20), height: rem(20) }} />;
 
@@ -205,8 +209,11 @@ const StudentCreationPage = () => {
   const matches = useMediaQuery("(min-width: 768px)");
 
   return (
-    <Box maw={700} mx="auto" p="lg" shadow="sm" withBorder>
-      <Paper shadow="xl" radius="lg" p="xl">
+    <Box maw={700} mx="auto" p="lg" style={{ backgroundColor: isDark ? '#1a1b1e' : '#fff' }}>
+      <Paper shadow="xl" radius="lg" p="xl" style={{ 
+        backgroundColor: isDark ? '#2c2e33' : '#fdfdfd',
+        color: isDark ? '#fff' : '#000'
+      }}>
         <Flex
           gap="md"
           justify="center"
@@ -239,7 +246,7 @@ const StudentCreationPage = () => {
           </Button>
         </Flex>
 
-        <Divider my="sm" />
+        <Divider my="sm" style={{ borderColor: isDark ? '#444' : '#e0e0e0' }} />
 
         {/* Progress Bar */}
         <Progress value={progress} color="blue" mb="md" />
@@ -385,52 +392,60 @@ const StudentCreationPage = () => {
           </Button>
         </Flex>
 
-          <Divider
-            mt={"20px"}
-            labelPosition="center"
-            label={
-              <>
-                <FaDiceD6 size={12} />
-              </>
-            }
+        <Divider
+          mt={"20px"}
+          style={{ borderColor: isDark ? '#444' : '#e0e0e0' }}
+          labelPosition="center"
+          label={
+            <>
+              <FaDiceD6 size={12} />
+            </>
+          }
+        />
+
+        <Stack justify="center" align="center" mt={'20px'}>
+          <Title
+            order={1}
+            sx={{
+              fontSize: { base: 'lg', sm: 'xl' },
+              lineHeight: 1.2,
+              wordBreak: 'break-word',
+            }}
+          >
+            Through CSV
+          </Title>
+          <FileInput
+            value={file}
+            onChange={handleFileSubmit}
+            size="md"
+            radius="xs"
+            placeholder="Upload CSV"
+            w={"50%"}
+            styles={{
+              input: { 
+                backgroundColor: isDark ? '#373a40' : '#fff',
+                color: isDark ? '#fff' : '#000',
+                borderColor: isDark ? '#444' : '#ced4da'
+              }
+            }}
           />
+          <Button
+            onClick={handleSubmit}
+            w={'50%'}
+            mt={'10px'} 
+            size="md" 
+          >
+            Create Students
+          </Button>
 
-          <Stack justify="center" align="center" mt={'20px'}>
-            <Title
-              order={1}
-              sx={{
-                fontSize: { base: 'lg', sm: 'xl' },
-                lineHeight: 1.2,
-                wordBreak: 'break-word',
-              }}
-            >
-              Through CSV
-            </Title>
-            <FileInput
-              value={file}
-              onChange={handleFileSubmit}
-              size="md"
-              radius="xs"
-              placeholder="Upload CSV"
-              w={"50%"}
-            />
-            <Button
-              onClick={handleSubmit}
-              w={'50%'}
-              mt={'10px'} 
-              size="md" 
-            >
-              Create Students
-            </Button>
-
-            <Button
+          <Button
             variant="light"
             color="gray"
             onClick={downloadSampleCSV}
           >
             Download Sample CSV
           </Button>
-          </Stack>
+        </Stack>
       </Paper>
     </Box>
   );

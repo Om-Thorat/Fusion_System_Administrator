@@ -3,7 +3,7 @@ import {
     Tabs, Card, Text, ScrollArea, Container, Title,
     Flex, Button, TextInput, MultiSelect, Grid, Paper,
     Center, Divider, Checkbox, Group, Modal,
-    rem
+    rem, useMantineColorScheme
 } from "@mantine/core";
 import { debounce } from "lodash";
 import { FaCheck } from "react-icons/fa";
@@ -102,27 +102,36 @@ const STATIC_FACULTY = [
     }
 ];
 
-const InfoCard = ({ person, selectable, selected, onSelectChange }) => (
-    <Card shadow="sm" radius="xl" withBorder p="lg" style={{ backgroundColor: "#fdfdfd" }}>
-        <Group position="apart" align="flex-start">
-            <div style={{ flex: 1 }}>
-                <Text fw={600} size="lg" mb="xs">{person.full_name}</Text>
-                <Text size="sm" c="dimmed"><strong>Username:</strong> {person.username}</Text>
-                <Divider my="sm" />
-                <Text size="sm"><strong>Department:</strong> {person.department}</Text>
-                <Text size="sm"><strong>Designation:</strong> {person.designations.join(', ')}</Text>
-                <Text size="sm"><strong>Gender:</strong> {person.gender}</Text>
-            </div>
-            {selectable && (
-                <Checkbox
-                    checked={selected}
-                    onChange={() => onSelectChange(person.username)}
-                    mt="sm"
-                />
-            )}
-        </Group>
-    </Card>
-);
+const InfoCard = ({ person, selectable, selected, onSelectChange }) => {
+    const { colorScheme } = useMantineColorScheme();
+    const isDark = colorScheme === "dark";
+    return (
+        <Card shadow="sm" radius="xl" withBorder p="lg" style={{
+            backgroundColor: isDark ? "#2c2e33" : "#fdfdfd",
+            color: isDark ? "#fff" : "#000"
+        }}>
+            <Group position="apart" align="flex-start">
+                <div style={{ flex: 1 }}>
+                    <Text fw={600} size="lg" mb="xs" style={{ color: isDark ? "#fff" : "#000" }}>
+                        {person.full_name}
+                    </Text>
+                    <Text size="sm" c="dimmed"><strong>Username:</strong> {person.username}</Text>
+                    <Divider my="sm" />
+                    <Text size="sm" style={{ color: isDark ? "#ccc" : "#000" }}><strong>Department:</strong> {person.department}</Text>
+                    <Text size="sm" style={{ color: isDark ? "#ccc" : "#000" }}><strong>Designation:</strong> {person.designations.join(', ')}</Text>
+                    <Text size="sm" style={{ color: isDark ? "#ccc" : "#000" }}><strong>Gender:</strong> {person.gender}</Text>
+                </div>
+                {selectable && (
+                    <Checkbox
+                        checked={selected}
+                        onChange={() => onSelectChange(person.username)}
+                        mt="sm"
+                    />
+                )}
+            </Group>
+        </Card>
+    );
+};
 
 const extractUnique = (arr, key) => [...new Set(arr.map(item => String(item[key])))];
 
@@ -140,6 +149,8 @@ const filterAndSearch = (data, filters, searchQuery) =>
     });
 
 const ArchiveFacultyPage = () => {
+    const { colorScheme } = useMantineColorScheme();
+    const isDark = colorScheme === "dark";
     const checkIcon = <FaCheck style={{ width: rem(20), height: rem(20) }} />;
 
     const [activeTab, setActiveTab] = useState("archive");
@@ -185,7 +196,7 @@ const ArchiveFacultyPage = () => {
     };
 
     return (
-        <Container size="lg" py="xl">
+        <Container size="lg" py="xl" style={{ backgroundColor: isDark ? '#1a1b1e' : '#f7f7f7', minHeight: '100vh' }}>
             <Flex
                 direction={{ base: 'column', sm: 'row' }}
                 gap={{ base: 'sm', sm: 'lg' }}
@@ -205,7 +216,7 @@ const ArchiveFacultyPage = () => {
                 </Button>
             </Flex>
 
-            <Paper shadow="lg" p="xl" radius="xl" withBorder>
+            <Paper shadow="lg" p="xl" radius="xl" withBorder style={{ backgroundColor: isDark ? '#2c2e33' : '#fff', borderColor: isDark ? '#444' : '#e0e0e0' }}>
                 <Tabs value={activeTab} onChange={setActiveTab} variant="pills" color="blue" radius="lg" keepMounted={false}>
                     <Tabs.List grow mb="lg">
                         <Tabs.Tab value="archive">ARCHIVE</Tabs.Tab>

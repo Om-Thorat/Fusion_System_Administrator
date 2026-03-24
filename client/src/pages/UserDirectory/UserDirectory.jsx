@@ -38,7 +38,7 @@ const InfoCard = React.memo(({ person }) => {
         transition: "background-color 0.2s ease",
       }}
       className="info-card"
-      onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = isDark ? "#373a40" : "#f2f2f2")}
+      onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = isDark ? "#373a40" : "#f9f9f9")}
       onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = isDark ? "#2c2e33" : "#fdfdfd")}
     >
       <Text fw={600} size="lg" mb="xs" style={{ color: isDark ? "#fff" : "#000" }}>
@@ -50,29 +50,29 @@ const InfoCard = React.memo(({ person }) => {
 
       {person.user_type === "student" && (
         <>
-          <Divider my="sm" />
-          <Text size="sm" style={{ color: isDark ? "#ccc" : "#000" }}><strong>Programme:</strong> {person.programme}</Text>
-          <Text size="sm" style={{ color: isDark ? "#ccc" : "#000" }}><strong>Discipline:</strong> {person.discipline}</Text>
-          <Text size="sm" style={{ color: isDark ? "#ccc" : "#000" }}><strong>Batch:</strong> {person.batch}</Text>
-          <Text size="sm" style={{ color: isDark ? "#ccc" : "#000" }}><strong>Semester:</strong> {person.curr_semester_no}</Text>
-          <Text size="sm" style={{ color: isDark ? "#ccc" : "#000" }}><strong>Category:</strong> {person.category}</Text>
-          <Text size="sm" style={{ color: isDark ? "#ccc" : "#000" }}><strong>Gender:</strong> {person.gender}</Text>
+          <Divider my="sm" style={{ borderColor: isDark ? '#444' : '#e0e0e0' }} />
+          <Text size="sm" style={{ color: isDark ? "#ccc" : "#333" }}><strong>Programme:</strong> {person.programme}</Text>
+          <Text size="sm" style={{ color: isDark ? "#ccc" : "#333" }}><strong>Discipline:</strong> {person.discipline}</Text>
+          <Text size="sm" style={{ color: isDark ? "#ccc" : "#333" }}><strong>Batch:</strong> {person.batch}</Text>
+          <Text size="sm" style={{ color: isDark ? "#ccc" : "#333" }}><strong>Semester:</strong> {person.curr_semester_no}</Text>
+          <Text size="sm" style={{ color: isDark ? "#ccc" : "#333" }}><strong>Category:</strong> {person.category}</Text>
+          <Text size="sm" style={{ color: isDark ? "#ccc" : "#333" }}><strong>Gender:</strong> {person.gender}</Text>
         </>
       )}
 
       {person.user_type === "staff" && (
         <>
-          <Divider my="sm" />
-          <Text size="sm" style={{ color: isDark ? "#ccc" : "#000" }}><strong>Gender:</strong> {person.gender}</Text>
+          <Divider my="sm" style={{ borderColor: isDark ? '#444' : '#e0e0e0' }} />
+          <Text size="sm" style={{ color: isDark ? "#ccc" : "#333" }}><strong>Gender:</strong> {person.gender}</Text>
         </>
       )}
 
       {person.user_type === "faculty" && (
         <>
-          <Divider my="sm" />
-          <Text size="sm" style={{ color: isDark ? "#ccc" : "#000" }}><strong>Department:</strong> {person.department}</Text>
-          <Text size="sm" style={{ color: isDark ? "#ccc" : "#000" }}><strong>Gender:</strong> {person.gender}</Text>
-          <Text size="sm" mb="xs" style={{ color: isDark ? "#ccc" : "#000" }}><strong>Designations:</strong></Text>
+          <Divider my="sm" style={{ borderColor: isDark ? '#444' : '#e0e0e0' }} />
+          <Text size="sm" style={{ color: isDark ? "#ccc" : "#333" }}><strong>Department:</strong> {person.department}</Text>
+          <Text size="sm" style={{ color: isDark ? "#ccc" : "#333" }}><strong>Gender:</strong> {person.gender}</Text>
+          <Text size="sm" mb="xs" style={{ color: isDark ? "#ccc" : "#333" }}><strong>Designations:</strong></Text>
           {person.designations.map((role, idx) => (
             <Badge key={idx} color="indigo" variant="light" radius="md" mr={5}>
               {role}
@@ -115,6 +115,9 @@ const filterAndSearch = (data, filters, searchQuery) =>
   });
 
 const UserDirectory = () => {
+  const { colorScheme } = useMantineColorScheme();
+  const isDark = colorScheme === "dark";
+  
   const [activeTab, setActiveTab] = useState("student");
   const [searchQuery, setSearchQuery] = useState("");
   const [filters, setFilters] = useState({
@@ -214,7 +217,7 @@ const UserDirectory = () => {
   );
 
   return (
-    <Container size="lg" py="xl">
+    <Container size="lg" py="xl" style={{ backgroundColor: isDark ? '#1a1b1e' : '#fff', minHeight: '100vh' }}>
       <Flex
         direction={{ base: "column", sm: "row" }}
         gap={{ base: "sm", sm: "lg" }}
@@ -247,7 +250,10 @@ const UserDirectory = () => {
         </Button>
       </Flex>
 
-      <Paper shadow="lg" p="xl" radius="xl" withBorder>
+      <Paper shadow="lg" p="xl" radius="xl" withBorder style={{ 
+        backgroundColor: isDark ? '#2c2e33' : '#fdfdfd',
+        borderColor: isDark ? '#444' : '#e0e0e0'
+      }}>
         <Tabs
           value={activeTab}
           onChange={setActiveTab}
@@ -271,6 +277,13 @@ const UserDirectory = () => {
                     radius="md"
                     placeholder="🔍 Search by name or username"
                     onChange={(e) => handleSearchChange(e.currentTarget.value)}
+                    styles={{
+                      input: { 
+                        backgroundColor: isDark ? '#373a40' : '#fff',
+                        color: isDark ? '#fff' : '#000',
+                        borderColor: isDark ? '#444' : '#ced4da'
+                      }
+                    }}
                   />
                 </Grid.Col>
 
@@ -294,6 +307,13 @@ const UserDirectory = () => {
                       }
                       clearable
                       searchable
+                      styles={{
+                        input: { 
+                          backgroundColor: isDark ? '#373a40' : '#fff',
+                          color: isDark ? '#fff' : '#000',
+                          borderColor: isDark ? '#444' : '#ced4da'
+                        }
+                      }}
                     />
                   </Grid.Col>
                 ))}

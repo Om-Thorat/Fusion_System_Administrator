@@ -1,4 +1,4 @@
-import { Progress, Box, Text, Group, Paper, SimpleGrid, rem } from '@mantine/core';
+import { Progress, Box, Text, Group, Paper, SimpleGrid, rem, useMantineColorScheme } from '@mantine/core';
 import { FaUsers, FaChartLine } from 'react-icons/fa';
 import classes from './StatsSegments.module.css';
 
@@ -9,6 +9,9 @@ const data = [
 ];
 
 export function StatsSegments() {
+    const { colorScheme } = useMantineColorScheme();
+    const isDark = colorScheme === "dark";
+
     const segments = data.map((segment) => (
         <Progress.Section value={segment.part} color={segment.color} key={segment.color}>
             {segment.part > 10 && <Progress.Label>{segment.part}%</Progress.Label>}
@@ -22,7 +25,7 @@ export function StatsSegments() {
             </Text>
 
             <Group justify="space-between" align="flex-end" gap={0}>
-                <Text fw={700}>{stat.count}</Text>
+                <Text fw={700} style={{ color: isDark ? '#fff' : undefined }}>{stat.count}</Text>
                 <Text c={stat.color} fw={700} size="sm" className={classes.statCount}>
                     {stat.part}%
                 </Text>
@@ -31,10 +34,14 @@ export function StatsSegments() {
     ));
 
     return (
-        <Paper withBorder p="md" radius="md">
+        <Paper withBorder p="md" radius="md" style={{
+            backgroundColor: isDark ? '#2c2e33' : undefined,
+            borderColor: isDark ? '#444' : undefined,
+            color: isDark ? '#fff' : undefined
+        }}>
             <Group justify="space-between">
                 <Group align="flex-end" gap="xs">
-                    <Text fz="xl" fw={700}>
+                    <Text fz="xl" fw={700} style={{ color: isDark ? '#fff' : undefined }}>
                         5,173
                     </Text>
                     <Text c="teal" className={classes.diff} fz="sm" fw={700}>

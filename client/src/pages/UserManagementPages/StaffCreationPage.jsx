@@ -14,6 +14,7 @@ import {
     Progress,
     Flex,
     Paper,
+    useMantineColorScheme,
 } from '@mantine/core';
 import { FaCheck, FaTimes } from 'react-icons/fa';
 import { notifications, showNotification } from '@mantine/notifications';
@@ -23,6 +24,9 @@ import { getAllDesignations, getAllDepartments } from '../../api/Roles';
 import { createStaff } from '../../api/Users';
 
 const StaffCreationPage = () => {
+    const { colorScheme } = useMantineColorScheme();
+    const isDark = colorScheme === "dark";
+    
     const xIcon = <FaTimes style={{ width: rem(20), height: rem(20) }} />;
     const checkIcon = <FaCheck style={{ width: rem(20), height: rem(20) }} />;
 
@@ -166,8 +170,11 @@ const StaffCreationPage = () => {
     const matches = useMediaQuery('(min-width: 768px)');
 
     return (
-        <Box maw={700} mx="auto" p="lg" shadow="sm" withBorder>
-            <Paper shadow="xl" radius="lg" p="xl">
+        <Box maw={700} mx="auto" p="lg" style={{ backgroundColor: isDark ? '#1a1b1e' : '#fff' }}>
+            <Paper shadow="xl" radius="lg" p="xl" style={{ 
+                backgroundColor: isDark ? '#2c2e33' : '#fdfdfd',
+                color: isDark ? '#fff' : '#000'
+            }}>
                 <Flex
                     gap="md"
                     justify="center"
@@ -201,7 +208,7 @@ const StaffCreationPage = () => {
                     </Button>
                 </Flex>
 
-                <Divider my="sm" />
+                <Divider my="sm" style={{ borderColor: isDark ? '#444' : '#e0e0e0' }} />
 
                 {/* Progress Bar */}
                 <Progress value={progress} color="blue" mb="md" />

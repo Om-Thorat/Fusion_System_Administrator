@@ -11,6 +11,7 @@ import {
     Checkbox,
     Center,
     Grid,
+    useMantineColorScheme,
 } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { users } from '../../data/users';
@@ -19,12 +20,9 @@ import { BarChart } from '@mantine/charts';
 function Simple({ title, data, colors, datakey }) {
     return (
         <div>
-            {/* Heading */}
             <Title order={2} align="center" mt="md" mb="lg">
                 {title}
             </Title>
-
-            {/* BarChart */}
             <BarChart
                 h={250}
                 data={data}
@@ -33,9 +31,9 @@ function Simple({ title, data, colors, datakey }) {
                 tickLine="y"
                 styles={{
                     bar: {
-                        transition: '0.3s', // Add smooth transition for hover
+                        transition: '0.3s',
                         '&:hover': {
-                            fillOpacity: 0.8, // Make it slightly transparent on hover
+                            fillOpacity: 0.8,
                         },
                     },
                 }}
@@ -45,6 +43,9 @@ function Simple({ title, data, colors, datakey }) {
 }
 
 const DeleteUserPage = () => {
+    const { colorScheme } = useMantineColorScheme();
+    const isDark = colorScheme === "dark";
+
     const [userBatchData, setUserBatchData] = useState([]);
     const [colors, setColors] = useState([{ name: 'Deleted', color: 'red' }]);
     const [userList, setUserList] = useState(users);
@@ -53,13 +54,12 @@ const DeleteUserPage = () => {
     const [opened, { open, close }] = useDisclosure(false);
 
     useEffect(() => {
-        // Aggregating user batch data to show in the BarChart
         const aggregatedData = userList.reduce((acc, user) => {
             const batch = user.batch;
             if (!acc[batch]) {
                 acc[batch] = { batch, Deleted: 0 };
             }
-            acc[batch].Deleted += 100; // Static data for now
+            acc[batch].Deleted += 100;
             return acc;
         }, {});
         setUserBatchData(Object.values(aggregatedData));
@@ -135,14 +135,14 @@ const DeleteUserPage = () => {
                 <Grid.Col span={12} style={{ display: 'flex' }}>
                     <Container
                         style={{
-                            backgroundColor: '#f8f9fa',
+                            backgroundColor: isDark ? "#2c2e33" : '#f8f9fa',
                             padding: '1rem',
-                            border: '2px solid #ababab',
+                            border: `2px solid ${isDark ? '#444' : '#ababab'}`,
                             borderRadius: '15px',
                             flex: 1,
                         }}
                     >
-                        <Simple title={'User Batch Data'} colors={colors} data={userBatchData} />
+                        <Simple title={'User Batch Data'} colors={colors} data={userBatchData} datakey="batch" />
                     </Container>
                 </Grid.Col>
             </Grid>
@@ -162,7 +162,8 @@ const DeleteUserPage = () => {
                             input: {
                                 marginLeft: 'auto',
                                 marginRight: 'auto',
-                                backgroundColor: 'white',
+                                backgroundColor: isDark ? '#2c2e33' : 'white',
+                                color: isDark ? '#fff' : '#000',
                                 borderRadius: '50px',
                                 boxShadow: 'xl',
                                 '&:hover': { boxShadow: '2xl' },
@@ -180,10 +181,10 @@ const DeleteUserPage = () => {
                                     mb={5}
                                     align="center"
                                     style={{
-                                        backgroundColor: 'white',
+                                        backgroundColor: isDark ? '#2c2e33' : 'white',
                                         padding: '10px',
                                         borderRadius: '8px',
-                                        border: '2px solid #f0f0f0',
+                                        border: `2px solid ${isDark ? '#444' : '#f0f0f0'}`,
                                     }}
                                 >
                                     <Checkbox
@@ -198,9 +199,9 @@ const DeleteUserPage = () => {
                                         }}
                                     />
                                     <Box ml={10} style={{ flex: 1 }}>
-                                        <div style={{ fontWeight: 'bold', fontSize: '1.2rem' }}>{user.name}</div>
-                                        <div style={{ marginLeft: '10px', fontSize: '0.9rem' }}>{user.rollNo}</div>
-                                        <div style={{ marginLeft: '10px', fontSize: '0.8rem' }}>{user.role}</div>
+                                        <div style={{ fontWeight: 'bold', fontSize: '1.2rem', color: isDark ? '#fff' : '#000' }}>{user.name}</div>
+                                        <div style={{ marginLeft: '10px', fontSize: '0.9rem', color: isDark ? '#ccc' : '#000' }}>{user.rollNo}</div>
+                                        <div style={{ marginLeft: '10px', fontSize: '0.8rem', color: isDark ? '#aaa' : '#000' }}>{user.role}</div>
                                     </Box>
                                 </Flex>
                             </Grid.Col>
@@ -214,7 +215,7 @@ const DeleteUserPage = () => {
                             gradient={{ from: 'lightyellow', to: 'red' }}
                             color="coral"
                             onClick={handleDelete}
-                            disabled={selectedUsers.length === 0} // Disable if no users are selected
+                            disabled={selectedUsers.length === 0}
                         >
                             Delete Selected
                         </Button>
@@ -229,7 +230,6 @@ const DeleteUserPage = () => {
                         <Button color="blue" onClick={confirmDelete} mr="10">
                             Proceed
                         </Button>
-
                         <Button variant="outline" onClick={close}>
                             Cancel
                         </Button>
@@ -239,4 +239,5 @@ const DeleteUserPage = () => {
         </Container>
     );
 };
+
 export default DeleteUserPage;

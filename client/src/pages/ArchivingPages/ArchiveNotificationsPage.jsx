@@ -15,7 +15,8 @@ import {
     Button,
     Flex,
     Checkbox,
-    Center
+    Center,
+    useMantineColorScheme,
 } from '@mantine/core'
 import { FaCube } from 'react-icons/fa';
 import { Simple } from '../../charts/BarChart/Simple/Simple';
@@ -24,6 +25,9 @@ import { notifications } from '../../data/notifications';
 import { showNotification } from '@mantine/notifications';
 
 const ArchiveNotificationsPage = () => {
+    const { colorScheme } = useMantineColorScheme();
+    const isDark = colorScheme === "dark";
+    
     const stats = [
         { title: 'Total Notifications', icon: 'speakerPhone', value: '5,173', diff: 34, time: "In last year" },
         { title: 'Archived', icon: 'arch', value: '573', diff: -30, time: "In last year" },
@@ -126,7 +130,7 @@ const ArchiveNotificationsPage = () => {
 
     // console.log(displayedNotifications)
     return (
-        <Container fluid my="md">
+        <Container fluid my="md" style={{ backgroundColor: isDark ? '#1a1b1e' : '#fff', minHeight: '100vh' }}>
             <Flex
                 direction={{ base: 'column', sm: 'row' }}
                 gap={{ base: 'sm', sm: 'lg' }}
@@ -162,7 +166,7 @@ const ArchiveNotificationsPage = () => {
 
             <Divider
                 my="xs"
-                // variant="dashed"
+                style={{ borderColor: isDark ? '#444' : '#e0e0e0' }}
                 labelPosition="center"
                 label={
                     <>
@@ -195,9 +199,11 @@ const ArchiveNotificationsPage = () => {
                             input: {
                                 marginLeft: 'auto',
                                 marginRight: 'auto',
-                                backgroundColor: 'white',
+                                backgroundColor: isDark ? '#373a40' : '#fff',
+                                color: isDark ? '#fff' : '#000',
                                 borderRadius: '50px',
                                 boxShadow: 'xl',
+                                borderColor: isDark ? '#444' : '#ced4da',
                                 '&:hover': { boxShadow: '2xl' },
                                 '&:focus': { borderColor: 'lightcoral' },
                             },
@@ -208,7 +214,7 @@ const ArchiveNotificationsPage = () => {
                     <Tabs color="lightcoral" defaultValue='0' value={tabIndex} onChange={setTabIndex}
                         style={{
                             width: '100%',
-                            backgroundColor: '#f8f9fa'
+                            backgroundColor: isDark ? '#2c2e33' : '#f8f9fa'
                         }}>
                         <Tabs.List justify='center' mb='10px'>
                             <Tabs.Tab
@@ -227,7 +233,7 @@ const ArchiveNotificationsPage = () => {
                             maxHeight: 400,
                             overflowY: 'auto',
                             scrollBehavior: 'auto',
-                            backgroundColor: '#f8f9fa',
+                            backgroundColor: isDark ? '#2c2e33' : '#f8f9fa',
                         }}>
                             <center>
                                 {filteredNotifications.map((notification) => (
@@ -237,11 +243,12 @@ const ArchiveNotificationsPage = () => {
                                         mb={5}
                                         align="center"
                                         style={{
-                                            backgroundColor: 'white',
+                                            backgroundColor: isDark ? '#373a40' : '#fff',
                                             padding: '10px',
                                             borderRadius: '8px',
-                                            border: '2px solid #f0f0f0',
+                                            border: `2px solid ${isDark ? '#444' : '#f0f0f0'}`,
                                             width: '70%',
+                                            color: isDark ? '#fff' : '#000'
                                         }}>
                                         <Checkbox
                                             checked={selectedNotifications.includes(notification.id)}
@@ -255,9 +262,9 @@ const ArchiveNotificationsPage = () => {
                                             }}
                                         />
                                         <Box ml={10} style={{ flex: 1 }}>
-                                            <div style={{ fontWeight: 'bold' }}>{notification.title}</div>
-                                            <div style={{ marginLeft: '10px' }}>{notification.message}
-                                                <div style={{ fontSize: 'small', textAlign: 'end' }}>{notification.time}</div>
+                                            <div style={{ fontWeight: 'bold', color: isDark ? '#fff' : '#000' }}>{notification.title}</div>
+                                            <div style={{ marginLeft: '10px', color: isDark ? '#ccc' : '#333' }}>{notification.message}
+                                                <div style={{ fontSize: 'small', textAlign: 'end', color: isDark ? '#aaa' : '#999' }}>{notification.time}</div>
                                             </div>
                                         </Box>
                                     </Flex>
@@ -269,7 +276,7 @@ const ArchiveNotificationsPage = () => {
                             maxHeight: 400,
                             overflowY: 'auto',
                             scrollBehavior: 'auto',
-                            backgroundColor: '#f8f9fa',
+                            backgroundColor: isDark ? '#2c2e33' : '#f8f9fa',
                         }}>
                             <center>
 
@@ -280,11 +287,12 @@ const ArchiveNotificationsPage = () => {
                                         mb={5}
                                         align="center"
                                         style={{
-                                            backgroundColor: 'white',
+                                            backgroundColor: isDark ? '#373a40' : '#fff',
                                             padding: '10px',
                                             borderRadius: '8px',
-                                            border: '2px solid #f0f0f0',
+                                            border: `2px solid ${isDark ? '#444' : '#f0f0f0'}`,
                                             width: '70%',
+                                            color: isDark ? '#fff' : '#000'
                                         }}>
                                         <Checkbox
                                             checked={selectedNotifications.includes(notification.id)}
@@ -298,9 +306,9 @@ const ArchiveNotificationsPage = () => {
                                             }}
                                         />
                                         <Box ml={10} style={{ flex: 1 }}>
-                                            <div style={{ fontWeight: 'bold' }}>{notification.title}</div>
-                                            <div style={{ marginLeft: '10px' }}>{notification.message}
-                                                <div style={{ fontSize: 'small', textAlign: 'end' }}>{notification.time}</div>
+                                            <div style={{ fontWeight: 'bold', color: isDark ? '#fff' : '#000' }}>{notification.title}</div>
+                                            <div style={{ marginLeft: '10px', color: isDark ? '#ccc' : '#333' }}>{notification.message}
+                                                <div style={{ fontSize: 'small', textAlign: 'end', color: isDark ? '#aaa' : '#999' }}>{notification.time}</div>
                                             </div>
                                         </Box>
                                     </Flex>
@@ -324,8 +332,8 @@ const ArchiveNotificationsPage = () => {
                         </Button>
                     </Group>
                 </Center>
-                <Modal opened={opened} onClose={close} title="Confirm Action" >
-                    <Modal.Body>
+                <Modal opened={opened} onClose={close} title="Confirm Action" styles={{ content: { backgroundColor: isDark ? '#2c2e33' : '#fff' } }}>
+                    <Modal.Body style={{ color: isDark ? '#fff' : '#000' }}>
                         Are you sure you want to {isArchiving ? 'archive' : 'unarchive'} the selected Notifications?
                     </Modal.Body>
                     <center>
@@ -345,4 +353,4 @@ const ArchiveNotificationsPage = () => {
     )
 }
 
-export default ArchiveNotificationsPage
+export default ArchiveNotificationsPage;

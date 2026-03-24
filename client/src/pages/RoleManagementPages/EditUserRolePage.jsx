@@ -10,6 +10,7 @@ import {
   TextInput,
   MultiSelect,
   Title,
+  useMantineColorScheme,
 } from "@mantine/core";
 import { notifications } from "@mantine/notifications";
 import axios from "axios";
@@ -17,6 +18,8 @@ import { useMediaQuery } from "@mantine/hooks";
 import { FaCheck, FaTimes } from 'react-icons/fa';
 
 const EditUserRolePage = () => {
+  const { colorScheme } = useMantineColorScheme();
+  const isDark = colorScheme === "dark";
   const [username, setUsername] = useState("");
   const [userDetails, setUserDetails] = useState(null);
   const [roles, setRoles] = useState([]);
@@ -123,7 +126,7 @@ const EditUserRolePage = () => {
   return (
     <Box
       style={{
-        backgroundColor: "#f0f0f0",
+        backgroundColor: isDark ? "#1a1b1e" : "#f0f0f0",
         minHeight: "100vh",
         padding: "1rem",
       }}
@@ -189,7 +192,7 @@ const EditUserRolePage = () => {
                 borderRadius: "8px",
                 boxShadow: "0px 4px 12px rgba(0, 0, 0, 0.1)",
                 position: "relative",
-                backgroundColor: "white",
+                backgroundColor: isDark ? "#2c2e33" : "white",
               }}
             >
               {/* Status Label at the top right */}
@@ -209,13 +212,13 @@ const EditUserRolePage = () => {
 
               {/* User Details */}
               <Stack spacing="1rem">
-                <Text style={{ fontSize: "1.1rem", fontWeight: "bold" }}>
+                <Text style={{ fontSize: "1.1rem", fontWeight: "bold", color: isDark ? "#fff" : "#000" }}>
                   Name: {userDetails.first_name}
                 </Text>
-                <Text style={{ fontSize: "1.1rem", fontWeight: "bold" }}>Roll No: {userDetails.username}</Text>
+                <Text style={{ fontSize: "1.1rem", fontWeight: "bold", color: isDark ? "#fff" : "#000" }}>Roll No: {userDetails.username}</Text>
 
                 {/* Display formatted date joined */}
-                <Text style={{ fontSize: "1.1rem", fontWeight: "bold" }}>
+                <Text style={{ fontSize: "1.1rem", fontWeight: "bold", color: isDark ? "#fff" : "#000" }}>
                   Date Joined: {new Date(userDetails.date_joined).toLocaleDateString(undefined, {
                     year: "numeric",
                     month: "long",
@@ -233,17 +236,17 @@ const EditUserRolePage = () => {
             width: "100%",
             flex: 1,
             padding: "1rem",
-            backgroundColor: "#fff",
+            backgroundColor: isDark ? "#2c2e33" : "#fff",
             borderRadius: "8px",
             boxShadow: "0px 4px 12px rgba(0, 0, 0, 0.1)",
             maxHeight: "400px",
           }}
         >
           {loading ? (
-            <Text>Loading roles...</Text>
+            <Text style={{ color: isDark ? "#fff" : "#000" }}>Loading roles...</Text>
           ) : userDetails ? (
             <Box>
-              <Text style={{ fontSize: "1.25rem", fontWeight: "bold" }}>Current Roles:</Text>
+              <Text style={{ fontSize: "1.25rem", fontWeight: "bold", color: isDark ? "#fff" : "#000" }}>Current Roles:</Text>
               {/* Scrollable roles section */}
               <Box
                 style={{
@@ -266,13 +269,13 @@ const EditUserRolePage = () => {
                         transition: "background-color 0.2s",
                       }}
                       onMouseEnter={(e) => {
-                        e.currentTarget.style.backgroundColor = "#f0f0f0";
+                        e.currentTarget.style.backgroundColor = isDark ? "#333" : "#f0f0f0";
                       }}
                       onMouseLeave={(e) => {
                         e.currentTarget.style.backgroundColor = "transparent";
                       }}
                     >
-                      <Text>{role.name}{role.basic ? "(Base)" : ""}</Text>
+                      <Text style={{ color: isDark ? "#fff" : "#000" }}>{role.name}{role.basic ? "(Base)" : ""}</Text>
                       <Button
                         variant="outline"
                         color="red"
@@ -310,7 +313,7 @@ const EditUserRolePage = () => {
               </Button>
             </Box>
           ) : (
-            <Text>No user details found</Text>
+            <Text style={{ color: isDark ? "#fff" : "#000" }}>No user details found</Text>
           )}
         </Box>
       </Flex>

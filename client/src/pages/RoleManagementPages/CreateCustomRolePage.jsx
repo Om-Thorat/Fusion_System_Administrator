@@ -13,6 +13,7 @@ import {
   Progress,
   rem,
   Select,
+  useMantineColorScheme,
 } from "@mantine/core";
 import { FaCheck, FaTimes } from 'react-icons/fa';
 import { notifications } from '@mantine/notifications';
@@ -25,6 +26,8 @@ function getProgress(inputs) {
 }
 
 const CreateCustomRolePage = () => {
+  const { colorScheme } = useMantineColorScheme();
+  const isDark = colorScheme === "dark";
   const xIcon = <FaTimes style={{ width: rem(20), height: rem(20) }} />;
   const checkIcon = <FaCheck style={{ width: rem(20), height: rem(20) }} />;
 
@@ -130,7 +133,7 @@ const CreateCustomRolePage = () => {
     <Box
       p="lg"
       style={{
-        backgroundColor: "#f7f7f7",
+        backgroundColor: isDark ? "#1a1b1e" : "#f7f7f7",
         minHeight: "100vh",
         display: "flex",
         alignItems: "center",
@@ -178,7 +181,8 @@ const CreateCustomRolePage = () => {
           gap="lg"
           p="xl"
           style={{
-            border: "2px solid #ccc",
+            border: isDark ? "2px solid #444" : "2px solid #ccc",
+            backgroundColor: isDark ? "#2c2e33" : "#fff",
             borderRadius: "10px",
             boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)",
             maxWidth: "500px",

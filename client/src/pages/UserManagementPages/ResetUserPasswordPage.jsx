@@ -17,7 +17,8 @@ import {
     SimpleGrid,
     Divider,
     Checkbox,
-    Center
+    Center,
+    useMantineColorScheme,
 } from '@mantine/core';
 
 import { showNotification } from '@mantine/notifications';
@@ -26,13 +27,15 @@ import { FaCheck, FaTimes, FaDiceD6 } from 'react-icons/fa';
 import { resetPassword } from '../../api/Users';
 
 const ResetUserPasswordPage = () => {
+    const { colorScheme } = useMantineColorScheme();
+    const isDark = colorScheme === "dark";
+
     const [formData, setFormData] = useState({
         username: '',
     });
 
     const [errorMessage, setErrorMessage] = useState('');
     const [opened, setOpened] = useState(false);
-
 
     const xIcon = <FaTimes style={{ width: rem(20), height: rem(20) }} />;
     const checkIcon = <FaCheck style={{ width: rem(20), height: rem(20) }} />;
@@ -43,7 +46,7 @@ const ResetUserPasswordPage = () => {
             ...prevData,
             [name]: value,
         }));
-        setErrorMessage(''); // Clear error when user starts typing
+        setErrorMessage('');
     };
 
     const openConfirmationDialog = () => {
@@ -72,21 +75,24 @@ const ResetUserPasswordPage = () => {
                 name: '',
                 rollNo: '',
             });
-        }
-        catch (e) {
+        } catch (e) {
             showNotification({
                 title: 'Error',
                 icon: xIcon,
                 position: "top-center",
                 withCloseButton: true,
-                message: 'An error occurred while resetting password.   ',
+                message: 'An error occurred while resetting password.',
                 color: 'red',
             });
         }
     };
 
     return (
-        <Box style={{ background: '#f7f7f7', minHeight: '100vh', padding: '20px' }}>
+        <Box style={{
+            background: isDark ? '#1a1b1e' : '#f7f7f7',
+            minHeight: '100vh',
+            padding: '20px'
+        }}>
             <Flex
                 direction={{ base: 'column', sm: 'row' }}
                 gap={{ base: 'sm', sm: 'lg' }}
@@ -118,21 +124,15 @@ const ResetUserPasswordPage = () => {
                 </Button>
             </Flex>
 
-
             <Divider
                 my="xs"
                 labelPosition="center"
-                label={
-                    <>
-                        <FaDiceD6 size={12} />
-                    </>
-                }
+                label={<><FaDiceD6 size={12} /></>}
             />
-
 
             <Box
                 style={{
-                    background: 'white',
+                    background: isDark ? '#2c2e33' : 'white',
                     padding: '20px',
                     borderRadius: '8px',
                     boxShadow: '0 2px 4px rgba(0, 0, 0, 0.2)',
@@ -150,6 +150,15 @@ const ResetUserPasswordPage = () => {
                             value={formData.username}
                             onChange={handleChange}
                             required
+                            styles={{
+                                input: {
+                                    backgroundColor: isDark ? '#373a40' : 'white',
+                                    color: isDark ? '#fff' : '#000',
+                                },
+                                label: {
+                                    color: isDark ? '#ccc' : '#000',
+                                }
+                            }}
                         />
 
                         {errorMessage && (
@@ -169,7 +178,6 @@ const ResetUserPasswordPage = () => {
                 </form>
             </Box>
 
-            {/* Confirmation Modal */}
             <Modal
                 opened={opened}
                 onClose={() => setOpened(false)}

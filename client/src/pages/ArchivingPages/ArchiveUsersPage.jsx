@@ -16,7 +16,8 @@ import {
     Flex,
     Checkbox,
     Center,
-    Grid
+    Grid,
+    useMantineColorScheme,
 } from '@mantine/core'
 import { Simple } from '../../charts/BarChart/Simple/Simple';
 import { useDisclosure } from '@mantine/hooks';
@@ -24,6 +25,8 @@ import { users } from '../../data/users';
 import SimplePieChart from '../../charts/PieChart/Tooltip/Tooltip';
 
 const ArchiveUsersPage = () => {
+    const { colorScheme } = useMantineColorScheme();
+    const isDark = colorScheme === "dark";
 
     const [userRoleData, setUserRoleData] = useState([])
     const [userBatchData, setUserBatchData] = useState([])
@@ -131,7 +134,7 @@ const ArchiveUsersPage = () => {
     const displayedUsers = filteredUsers.filter(user => (tabIndex === 0 ? !user.isArchived : user.isArchived));
 
     return (
-        <Container fluid my="md">
+        <Container fluid my="md" style={{ backgroundColor: isDark ? '#1a1b1e' : '#fff', minHeight: '100vh' }}>
             <Flex
                 direction={{ base: 'column', sm: 'row' }}
                 gap={{ base: 'sm', sm: 'lg' }}
@@ -166,9 +169,9 @@ const ArchiveUsersPage = () => {
             <Grid style={{ display: 'flex', alignItems: 'stretch' }}>
                 <Grid.Col span={6} style={{ display: 'flex' }}>
                     <Container style={{
-                        backgroundColor: '#f8f9fa',
+                        backgroundColor: isDark ? '#2c2e33' : '#f8f9fa',
                         padding: '1rem',
-                        border: '2px solid #ababab',
+                        border: `2px solid ${isDark ? '#444' : '#ababab'}`,
                         borderRadius: '15px',
                         flex: 1
                     }}>
@@ -177,9 +180,9 @@ const ArchiveUsersPage = () => {
                 </Grid.Col>
                 <Grid.Col span={6} style={{ display: 'flex' }}>
                     <Container style={{
-                        backgroundColor: '#f8f9fa',
+                        backgroundColor: isDark ? '#2c2e33' : '#f8f9fa',
                         padding: '1rem',
-                        border: '2px solid #ababab',
+                        border: `2px solid ${isDark ? '#444' : '#ababab'}`,
                         borderRadius: '15px',
                         flex: 1
                     }}>
@@ -203,9 +206,11 @@ const ArchiveUsersPage = () => {
                             input: {
                                 marginLeft: 'auto',
                                 marginRight: 'auto',
-                                backgroundColor: 'white',
+                                backgroundColor: isDark ? '#373a40' : '#fff',
+                                color: isDark ? '#fff' : '#000',
                                 borderRadius: '50px',
                                 boxShadow: 'xl',
+                                borderColor: isDark ? '#444' : '#ced4da',
                                 '&:hover': { boxShadow: '2xl' },
                                 '&:focus': { borderColor: 'lightcoral' },
                             },
@@ -216,7 +221,7 @@ const ArchiveUsersPage = () => {
                     <Tabs color="lightcoral" defaultValue='0' value={tabIndex} onChange={setTabIndex}
                         style={{
                             width: '100%',
-                            backgroundColor: '#f8f9fa'
+                            backgroundColor: isDark ? '#2c2e33' : '#f8f9fa'
                         }}>
                         <Tabs.List justify='center' mb='10px'>
                             <Tabs.Tab value='0'>Active Users</Tabs.Tab>
@@ -228,7 +233,7 @@ const ArchiveUsersPage = () => {
                             maxHeight: 400,
                             overflowY: 'auto',
                             scrollBehavior: 'auto',
-                            backgroundColor: '#f8f9fa',
+                            backgroundColor: isDark ? '#2c2e33' : '#f8f9fa',
                         }}>
                             <Grid>
                                 {filteredUsers.map((user) => (
@@ -237,10 +242,11 @@ const ArchiveUsersPage = () => {
                                             mb={5}
                                             align="center"
                                             style={{
-                                                backgroundColor: 'white',
+                                                backgroundColor: isDark ? '#373a40' : '#fff',
                                                 padding: '10px',
                                                 borderRadius: '8px',
-                                                border: '2px solid #f0f0f0',
+                                                border: `2px solid ${isDark ? '#444' : '#f0f0f0'}`,
+                                                color: isDark ? '#fff' : '#000'
                                             }}>
                                             <Checkbox
                                                 checked={selectedUsers.includes(user.id)}
@@ -254,9 +260,9 @@ const ArchiveUsersPage = () => {
                                                 }}
                                             />
                                             <Box ml={10} style={{ flex: 1 }}>
-                                                <div style={{ fontWeight: 'bold', fontSize: '1.2rem' }}>{user.name}</div>
-                                                <div style={{ marginLeft: '10px', fontSize: '0.9rem' }}>{user.rollNo}</div>
-                                                <div style={{ marginLeft: '10px', fontSize: '0.8rem' }}>{user.role}</div>
+                                                <div style={{ fontWeight: 'bold', fontSize: '1.2rem', color: isDark ? '#fff' : '#000' }}>{user.name}</div>
+                                                <div style={{ marginLeft: '10px', fontSize: '0.9rem', color: isDark ? '#ccc' : '#666' }}>{user.rollNo}</div>
+                                                <div style={{ marginLeft: '10px', fontSize: '0.8rem', color: isDark ? '#aaa' : '#999' }}>{user.role}</div>
                                             </Box>
                                         </Flex>
                                     </Grid.Col>
@@ -269,7 +275,7 @@ const ArchiveUsersPage = () => {
                             maxHeight: 400,
                             overflowY: 'auto',
                             scrollBehavior: 'auto',
-                            backgroundColor: '#f8f9fa',
+                            backgroundColor: isDark ? '#2c2e33' : '#f8f9fa',
                         }}>
                             <Grid>
                                 {displayedUsers.map((user) => (
@@ -278,10 +284,11 @@ const ArchiveUsersPage = () => {
                                             mb={5}
                                             align="center"
                                             style={{
-                                                backgroundColor: 'white',
+                                                backgroundColor: isDark ? '#373a40' : '#fff',
                                                 padding: '10px',
                                                 borderRadius: '8px',
-                                                border: '2px solid #f0f0f0',
+                                                border: `2px solid ${isDark ? '#444' : '#f0f0f0'}`,
+                                                color: isDark ? '#fff' : '#000'
                                             }}>
                                             <Checkbox
                                                 checked={selectedUsers.includes(user.id)}
@@ -295,9 +302,9 @@ const ArchiveUsersPage = () => {
                                                 }}
                                             />
                                             <Box ml={10} style={{ flex: 1 }}>
-                                                <div style={{ fontWeight: 'bold', fontSize: '1.2rem' }}>{user.name}</div>
-                                                <div style={{ marginLeft: '10px', fontSize: '0.9rem' }}>{user.rollNo}</div>
-                                                <div style={{ marginLeft: '10px', fontSize: '0.8rem' }}>{user.role}</div>
+                                                <div style={{ fontWeight: 'bold', fontSize: '1.2rem', color: isDark ? '#fff' : '#000' }}>{user.name}</div>
+                                                <div style={{ marginLeft: '10px', fontSize: '0.9rem', color: isDark ? '#ccc' : '#666' }}>{user.rollNo}</div>
+                                                <div style={{ marginLeft: '10px', fontSize: '0.8rem', color: isDark ? '#aaa' : '#999' }}>{user.role}</div>
                                             </Box>
                                         </Flex>
                                     </Grid.Col>
@@ -321,8 +328,8 @@ const ArchiveUsersPage = () => {
                         </Button>
                     </Group>
                 </Center>
-                <Modal opened={opened} onClose={close} title="Confirm Action" >
-                    <Modal.Body>
+                <Modal opened={opened} onClose={close} title="Confirm Action" styles={{ content: { backgroundColor: isDark ? '#2c2e33' : '#fff' } }}>
+                    <Modal.Body style={{ color: isDark ? '#fff' : '#000' }}>
                         Are you sure you want to {isArchiving ? 'archive' : 'unarchive'} the selected Users?
                     </Modal.Body>
                     <center>
@@ -341,13 +348,4 @@ const ArchiveUsersPage = () => {
     )
 }
 
-export default ArchiveUsersPage
-
-
-//sample data
-// export const data = [
-//     { name: 'USA', value: 400, color: 'indigo.6' },
-//     { name: 'India', value: 300, color: 'yellow.6' },
-//     { name: 'Japan', value: 300, color: 'teal.6' },
-//     { name: 'Other', value: 200, color: 'gray.6' },
-// ];
+export default ArchiveUsersPage;
