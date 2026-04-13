@@ -43,7 +43,7 @@ import {
   getRestoreStatus,
 } from "../../api/Backups";
 
-// â”€â”€ helpers â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── helpers ────────────────────────────────────────────────────────────────────
 
 const fmtDate = (iso) => {
   const d = new Date(iso);
@@ -70,20 +70,20 @@ const relativeTime = (d) => {
 };
 
 const fmtBytes = (bytes) => {
-  if (!bytes || bytes <= 0) return "â€”";
+  if (!bytes || bytes <= 0) return "—";
   if (bytes >= 1e9) return (bytes / 1e9).toFixed(2) + " GB";
   if (bytes >= 1e6) return (bytes / 1e6).toFixed(2) + " MB";
   return (bytes / 1e3).toFixed(2) + " KB";
 };
 
 const fmtDuration = (ms) => {
-  if (!ms || ms <= 0) return "â€”";
+  if (!ms || ms <= 0) return "—";
   const s = Math.floor(ms / 1000);
   const m = Math.floor(s / 60);
   return m > 0 ? `${m}m ${s % 60}s` : `${s}s`;
 };
 
-// â”€â”€ sub-components â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── sub-components ─────────────────────────────────────────────────────────────
 
 const StatusBadge = ({ status }) => {
   if (status === "in_progress")
@@ -130,10 +130,10 @@ const BackupHeatmap = ({ backups }) => {
       const dur = b.duration_ms > 0 ? fmtDuration(b.duration_ms) : null;
       const label =
         b.status === "success"
-          ? `${dateStr} ${timeStr} â€” ${size ?? "?"}${dur ? `, ${dur}` : ""}`
+          ? `${dateStr} ${timeStr} — ${size ?? "?"}${dur ? `, ${dur}` : ""}`
           : b.status === "failed"
-            ? `${dateStr} ${timeStr} â€” Failed: ${b.error_message || "unknown error"}`
-            : `${dateStr} ${timeStr} â€” In progress`;
+            ? `${dateStr} ${timeStr} — Failed: ${b.error_message || "unknown error"}`
+            : `${dateStr} ${timeStr} — In progress`;
       return { status: b.status, label };
     });
     return padded;
@@ -180,7 +180,7 @@ const BackupHeatmap = ({ backups }) => {
   );
 };
 
-// â”€â”€ main page â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── main page ──────────────────────────────────────────────────────────────────
 
 const BackupPage = () => {
   const [databases, setDatabases] = useState([]);
@@ -199,7 +199,7 @@ const BackupPage = () => {
   const pollTimerRef = useRef(null);
   const restorePollTimerRef = useRef(null);
 
-  // â”€â”€ load databases â”€â”€
+  // ── load databases ──
   useEffect(() => {
     let cancelled = false;
     const load = async () => {
@@ -225,7 +225,7 @@ const BackupPage = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // â”€â”€ load backups when db changes â”€â”€
+  // ── load backups when db changes ──
   const loadBackups = useCallback(async () => {
     if (!selectedDb) return;
     setLoadingBackups(true);
@@ -243,7 +243,7 @@ const BackupPage = () => {
     loadBackups();
   }, [loadBackups]);
 
-  // â”€â”€ load restores when db changes â”€â”€
+  // ── load restores when db changes ──
   const loadRestores = useCallback(async () => {
     if (!selectedDb) return;
     setLoadingRestores(true);
@@ -261,7 +261,7 @@ const BackupPage = () => {
     loadRestores();
   }, [loadRestores]);
 
-  // â”€â”€ poll in-progress restores â”€â”€
+  // ── poll in-progress restores ──
   useEffect(() => {
     if (restorePollTimerRef.current) {
       clearInterval(restorePollTimerRef.current);
@@ -321,7 +321,7 @@ const BackupPage = () => {
     };
   }, [restores, loadBackups]);
 
-  // â”€â”€ poll in-progress backups â”€â”€
+  // ── poll in-progress backups ──
   useEffect(() => {
     if (pollTimerRef.current) {
       clearInterval(pollTimerRef.current);
@@ -346,7 +346,7 @@ const BackupPage = () => {
             if (fresh.status === "success") {
               showNotification({
                 title: "Backup complete",
-                message: `Backup finished in ${fmtDuration(fresh.duration_ms)} â€” ${fmtBytes(fresh.size_bytes)}`,
+                message: `Backup finished in ${fmtDuration(fresh.duration_ms)} — ${fmtBytes(fresh.size_bytes)}`,
                 color: "green",
                 position: "top-center",
               });
@@ -377,7 +377,7 @@ const BackupPage = () => {
     };
   }, [backups]);
 
-  // â”€â”€ actions â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ── actions ──────────────────────────────────────────────────────────────────
 
   const handleMakeBackup = async () => {
     setMakingBackup(true);
@@ -465,7 +465,7 @@ const BackupPage = () => {
     }
   };
 
-  // â”€â”€ render â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ── render ───────────────────────────────────────────────────────────────────
 
   if (loadingDbs) {
     return (
@@ -488,7 +488,7 @@ const BackupPage = () => {
       </Flex>
 
       <Flex gap="xl" align="flex-start" wrap="wrap">
-        {/* â”€â”€ Left panel: database list â”€â”€ */}
+        {/* ── Left panel: database list ── */}
         <Paper
           shadow="md"
           radius="lg"
@@ -558,7 +558,7 @@ const BackupPage = () => {
           ))}
         </Paper>
 
-        {/* â”€â”€ Right panel â”€â”€ */}
+        {/* ── Right panel ── */}
         <Box style={{ flex: 1, minWidth: 0, maxWidth: "100%" }}>
           {/* Backup Heatmap */}
           <Paper shadow="md" radius="lg" p="lg" withBorder mb="xl">
@@ -697,7 +697,7 @@ const BackupPage = () => {
                           <Flex align="center" gap={8}>
                             <Text size="sm" fw={600}>
                               {isRunning
-                                ? "Restore in progressâ€¦"
+                                ? "Restore in progress…"
                                 : isOk
                                   ? "Restore successful"
                                   : "Restore failed"}
@@ -852,7 +852,7 @@ const BackupPage = () => {
                           <td>
                             <Text size="sm">
                               {b.status === "in_progress"
-                                ? "â€”"
+                                ? "—"
                                 : fmtDuration(b.duration_ms)}
                             </Text>
                           </td>
@@ -900,7 +900,7 @@ const BackupPage = () => {
         </Box>
       </Flex>
 
-      {/* â”€â”€ Delete confirm modal â”€â”€ */}
+      {/* ── Delete confirm modal ── */}
       <Modal
         opened={deleteModal.open}
         onClose={() => setDeleteModal({ open: false, id: null })}
@@ -926,7 +926,7 @@ const BackupPage = () => {
         </Flex>
       </Modal>
 
-      {/* â”€â”€ Restore confirm modal â”€â”€ */}
+      {/* ── Restore confirm modal ── */}
       <Modal
         opened={restoreModal.open}
         onClose={() => setRestoreModal({ open: false, id: null })}
