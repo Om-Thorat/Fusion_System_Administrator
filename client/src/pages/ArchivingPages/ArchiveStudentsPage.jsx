@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import {
     Tabs, Card, Text, ScrollArea, Container, Title,
     Flex, Button, TextInput, MultiSelect, Grid, Loader,
@@ -8,142 +8,31 @@ import {
 import { debounce } from "lodash";
 import { showNotification } from "@mantine/notifications";
 import { FaCheck, FaTimes } from "react-icons/fa";
+import { bulkArchiveStudents, getArchiveRecords, unarchiveStudent, viewArchive } from "../../api/Archive";
+import { fetchUsersByType } from "../../api/Users";
 
-const STATIC_STUDENTS = [
-    {
-        id: "21BCS030",
-        username: "21BCS030",
-        full_name: "ARJIT PATEL",
-        user_type: "student",
-        programme: "B.Tech",
-        discipline: "Computer Science and Engineering",
-        batch: 2021,
-        curr_semester_no: 8,
-        category: "GEN",
-        gender: "male"
-    },
-    {
-        id: "20BEE014",
-        username: "20BEE014",
-        full_name: "SNEHA GUPTA",
-        user_type: "student",
-        programme: "B.Tech",
-        discipline: "Electrical and Electronics Engineering",
-        batch: 2020,
-        curr_semester_no: 8,
-        category: "OBC",
-        gender: "female"
-    },
-    {
-        id: "22MCS007",
-        username: "22MCS007",
-        full_name: "RAHUL SINGH",
-        user_type: "student",
-        programme: "M.Tech",
-        discipline: "Computer Science and Engineering",
-        batch: 2022,
-        curr_semester_no: 2,
-        category: "GEN",
-        gender: "male"
-    },
-    {
-        id: "21BEC021",
-        username: "21BEC021",
-        full_name: "PRIYA VERMA",
-        user_type: "student",
-        programme: "B.Tech",
-        discipline: "Electronics and Communication Engineering",
-        batch: 2021,
-        curr_semester_no: 6,
-        category: "SC",
-        gender: "female"
-    },
-    {
-        id: "19BME013",
-        username: "19BME013",
-        full_name: "RITESH NAIR",
-        user_type: "student",
-        programme: "B.Tech",
-        discipline: "Mechanical Engineering",
-        batch: 2019,
-        curr_semester_no: 8,
-        category: "ST",
-        gender: "male"
-    },
-    {
-        id: "23MEE002",
-        username: "23MEE002",
-        full_name: "NEHA SHARMA",
-        user_type: "student",
-        programme: "M.Tech",
-        discipline: "Mechanical Engineering",
-        batch: 2023,
-        curr_semester_no: 1,
-        category: "GEN",
-        gender: "female"
-    },
-    {
-        id: "21BCS019",
-        username: "21BCS019",
-        full_name: "ADITYA RAO",
-        user_type: "student",
-        programme: "B.Tech",
-        discipline: "Computer Science and Engineering",
-        batch: 2021,
-        curr_semester_no: 6,
-        category: "GEN",
-        gender: "male"
-    },
-    {
-        id: "20BCE025",
-        username: "20BCE025",
-        full_name: "AARUSHI MEHTA",
-        user_type: "student",
-        programme: "B.Tech",
-        discipline: "Civil Engineering",
-        batch: 2020,
-        curr_semester_no: 7,
-        category: "OBC",
-        gender: "female"
-    },
-    {
-        id: "22PHDCSE01",
-        username: "22PHDCSE01",
-        full_name: "DR. TANVI DAS",
-        user_type: "student",
-        programme: "PhD",
-        discipline: "Computer Science and Engineering",
-        batch: 2022,
-        curr_semester_no: 3,
-        category: "GEN",
-        gender: "female"
-    },
-    {
-        id: "21BEE017",
-        username: "21BEE017",
-        full_name: "KARAN THAKUR",
-        user_type: "student",
-        programme: "B.Tech",
-        discipline: "Electrical and Electronics Engineering",
-        batch: 2021,
-        curr_semester_no: 5,
-        category: "SC",
-        gender: "male"
-    }
-];
-const InfoCard = ({ person, selectable, selected, onSelectChange }) => (
-    <Card shadow="sm" radius="xl" withBorder p="lg" style={{ backgroundColor: "#fdfdfd" }}>
+const InfoCard = ({ person, selectable, selected, onSelectChange, onClick, showUnarchive, onUnarchive, unarchiveLoading }) => (
+    <Card
+        shadow="sm"
+        radius="xl"
+        withBorder
+        p="lg"
+        style={{ backgroundColor: "#fdfdfd", cursor: onClick ? "pointer" : "default" }}
+        onClick={onClick}
+    >
         <Group position="apart" align="flex-start">
             <div style={{ flex: 1 }}>
                 <Text fw={600} size="lg" mb="xs">{person.full_name}</Text>
                 <Text size="sm" c="dimmed"><strong>Username:</strong> {person.username}</Text>
                 <Divider my="sm" />
-                <Text size="sm"><strong>Programme:</strong> {person.programme}</Text>
-                <Text size="sm"><strong>Discipline:</strong> {person.discipline}</Text>
-                <Text size="sm"><strong>Batch:</strong> {person.batch}</Text>
-                <Text size="sm"><strong>Semester:</strong> {person.curr_semester_no}</Text>
-                <Text size="sm"><strong>Category:</strong> {person.category}</Text>
-                <Text size="sm"><strong>Gender:</strong> {person.gender}</Text>
+                <Text size="sm"><strong>Programme:</strong> {person.programme || "-"}</Text>
+                <Text size="sm"><strong>Discipline:</strong> {person.discipline || "-"}</Text>
+                <Text size="sm"><strong>Batch:</strong> {person.batch || "-"}</Text>
+                {person.curr_semester_no !== undefined && (
+                    <Text size="sm"><strong>Semester:</strong> {person.curr_semester_no}</Text>
+                )}
+                {person.category && <Text size="sm"><strong>Category:</strong> {person.category}</Text>}
+                {person.gender && <Text size="sm"><strong>Gender:</strong> {person.gender}</Text>}
             </div>
             {selectable && (
                 <Checkbox
@@ -152,6 +41,21 @@ const InfoCard = ({ person, selectable, selected, onSelectChange }) => (
                     mt="sm"
                 />
             )}
+            {showUnarchive && (
+                <Button
+                    size="xs"
+                    color="red"
+                    variant="light"
+                    loading={unarchiveLoading}
+                    onClick={(event) => {
+                        event.stopPropagation();
+                        onUnarchive(person.username);
+                    }}
+                    mt="sm"
+                >
+                    Unarchive
+                </Button>
+            )}
         </Group>
     </Card>
 );
@@ -159,26 +63,46 @@ const InfoCard = ({ person, selectable, selected, onSelectChange }) => (
 const extractUnique = (arr, key) =>
     [...new Set(arr.map((item) => key === "semester"
         ? String(item.curr_semester_no)
-        : String(item[key])
-    ))];
+        : String(item[key] ?? "")
+    ).filter(Boolean))];
 
 const filterAndSearch = (data, filters, searchQuery) =>
     data.filter((person) => {
-        const matchSearch = person.full_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            person.username.toLowerCase().includes(searchQuery.toLowerCase());
+        const fullName = String(person.full_name || "").toLowerCase();
+        const username = String(person.username || "").toLowerCase();
+        const query = String(searchQuery || "").toLowerCase();
+
+        const matchSearch = fullName.includes(query) || username.includes(query);
 
         const matchFilters = Object.entries(filters).every(([key, values]) => {
             if (values.length === 0) return true;
-            const value = key === "semester" ? String(person.curr_semester_no) : String(person[key]);
+            const value = key === "semester"
+                ? String(person.curr_semester_no ?? "")
+                : String(person[key] ?? "");
             return values.includes(value);
         });
 
         return matchSearch && matchFilters;
     });
 
+    const getLatestRecordMap = (records) => {
+        const map = new Map();
+        records.forEach((record) => {
+            if (!map.has(record.student_username)) {
+                map.set(record.student_username, record);
+            }
+        });
+        return map;
+    };
+
 const ArchiveStudentPage = () => {
     const checkIcon = <FaCheck style={{ width: rem(20), height: rem(20) }} />;
+    const xIcon = <FaTimes style={{ width: rem(20), height: rem(20) }} />;
 
+        const [students, setStudents] = useState([]);
+        const [archiveRecords, setArchiveRecords] = useState([]);
+        const [loadingStudents, setLoadingStudents] = useState(true);
+        const [loadingRecords, setLoadingRecords] = useState(true);
     const [activeTab, setActiveTab] = useState("archive");
     const [searchQuery, setSearchQuery] = useState("");
     const [filters, setFilters] = useState({
@@ -186,14 +110,97 @@ const ArchiveStudentPage = () => {
     });
     const [selectedUsernames, setSelectedUsernames] = useState([]);
     const [modalOpened, setModalOpened] = useState(false);
-    const [actionType, setActionType] = useState("");
+    const [submittingArchive, setSubmittingArchive] = useState(false);
+    const [unarchivingUsername, setUnarchivingUsername] = useState("");
+    const [unarchiveModalOpened, setUnarchiveModalOpened] = useState(false);
+    const [unarchiveTargetUsername, setUnarchiveTargetUsername] = useState("");
+    const [archivedSearchQuery, setArchivedSearchQuery] = useState("");
+    const [viewerModalOpened, setViewerModalOpened] = useState(false);
+    const [viewerLoading, setViewerLoading] = useState(false);
+    const [viewerUsername, setViewerUsername] = useState("");
+    const [viewerData, setViewerData] = useState(null);
 
     const handleSearchChange = useMemo(() =>
         debounce((value) => setSearchQuery(value), 200), []);
 
+    const loadStudents = async () => {
+        setLoadingStudents(true);
+        try {
+            const response = await fetchUsersByType("student");
+            setStudents(Array.isArray(response) ? response : []);
+        } catch (error) {
+            setStudents([]);
+            showNotification({
+                icon: xIcon,
+                title: "Failed",
+                position: "top-center",
+                withCloseButton: true,
+                autoClose: 5000,
+                message: error.response?.data?.error || "Unable to load students.",
+                color: "red",
+            });
+        } finally {
+            setLoadingStudents(false);
+        }
+    };
+
+    const loadArchiveRecords = async () => {
+        setLoadingRecords(true);
+        try {
+            const response = await getArchiveRecords();
+            setArchiveRecords(Array.isArray(response) ? response : []);
+        } catch (error) {
+            setArchiveRecords([]);
+            showNotification({
+                icon: xIcon,
+                title: "Failed",
+                position: "top-center",
+                withCloseButton: true,
+                autoClose: 5000,
+                message: error.response?.data?.error || "Unable to load archive records.",
+                color: "red",
+            });
+        } finally {
+            setLoadingRecords(false);
+        }
+    };
+
+    useEffect(() => {
+        loadStudents();
+        loadArchiveRecords();
+    }, []);
+
+    useEffect(() => {
+        return () => {
+            handleSearchChange.cancel();
+        };
+    }, [handleSearchChange]);
+
+    const latestRecordMap = useMemo(() => getLatestRecordMap(archiveRecords), [archiveRecords]);
+
+    const archiveCandidates = useMemo(
+        () => students.filter((student) => !latestRecordMap.has(student.username)),
+        [students, latestRecordMap],
+    );
+
+    const archivedStudents = useMemo(
+        () => Array.from(latestRecordMap.values()).filter((record) => record.archive_type === "archived"),
+        [latestRecordMap],
+    );
+
+    const filteredArchivedStudents = useMemo(() => {
+        const query = String(archivedSearchQuery || "").toLowerCase();
+        if (!query) return archivedStudents;
+        return archivedStudents.filter((student) => {
+            const username = String(student.student_username || "").toLowerCase();
+            const fullName = String(student.full_name || "").toLowerCase();
+            return username.includes(query) || fullName.includes(query);
+        });
+    }, [archivedStudents, archivedSearchQuery]);
+
     const filteredData = useMemo(() =>
-        filterAndSearch(STATIC_STUDENTS, filters, searchQuery),
-        [filters, searchQuery]
+        filterAndSearch(archiveCandidates, filters, searchQuery),
+        [archiveCandidates, filters, searchQuery]
     );
 
     const isSelected = (username) => selectedUsernames.includes(username);
@@ -209,23 +216,110 @@ const ArchiveStudentPage = () => {
 
     const clearSelection = () => setSelectedUsernames([]);
 
-    const handleAction = (type) => {
-        setActionType(type);
+    const handleArchiveAction = () => {
         setModalOpened(true);
     };
 
-    const confirmAction = () => {
-        showNotification({
-            icon: checkIcon,
-            title: "Success",
-            position: "top-center",
-            withCloseButton: true,
-            autoClose: 5000,
-            message: `Marked selected students as "${actionType}"`,
-            color: "green",
-        });
-        clearSelection();
-        setModalOpened(false);
+    const openUnarchiveModal = (username) => {
+        setUnarchiveTargetUsername(username);
+        setUnarchiveModalOpened(true);
+    };
+
+    const confirmUnarchive = async () => {
+        if (!unarchiveTargetUsername) return;
+        setUnarchivingUsername(unarchiveTargetUsername);
+        try {
+            await unarchiveStudent(unarchiveTargetUsername);
+            showNotification({
+                icon: checkIcon,
+                title: "Success",
+                position: "top-center",
+                withCloseButton: true,
+                autoClose: 5000,
+                message: `${unarchiveTargetUsername} has been unarchived successfully.`,
+                color: "green",
+            });
+            await loadArchiveRecords();
+            setUnarchiveModalOpened(false);
+            setUnarchiveTargetUsername("");
+        } catch (error) {
+            showNotification({
+                icon: xIcon,
+                title: "Unarchive Failed",
+                position: "top-center",
+                withCloseButton: true,
+                autoClose: 5000,
+                message: error.response?.data?.error || "Failed to unarchive student.",
+                color: "red",
+            });
+        } finally {
+            setUnarchivingUsername("");
+        }
+    };
+
+    const handleOpenArchivedViewer = async (username) => {
+        setViewerLoading(true);
+        setViewerUsername(username);
+        setViewerModalOpened(true);
+
+        try {
+            const response = await viewArchive(username);
+            setViewerData(response.data || null);
+        } catch (error) {
+            setViewerData(null);
+            showNotification({
+                icon: xIcon,
+                title: "Failed to load archive",
+                position: "top-center",
+                withCloseButton: true,
+                autoClose: 5000,
+                message: error.response?.data?.error || "Unable to fetch archived data.",
+                color: "red",
+            });
+        } finally {
+            setViewerLoading(false);
+        }
+    };
+
+    const confirmAction = async () => {
+        setSubmittingArchive(true);
+        const archivedBy =
+            localStorage.getItem("username") ||
+            localStorage.getItem("loggedInUsername") ||
+            "system_admin";
+
+        try {
+            const response = await bulkArchiveStudents(
+                selectedUsernames,
+                "archived",
+                archivedBy,
+            );
+
+            showNotification({
+                icon: checkIcon,
+                title: "Success",
+                position: "top-center",
+                withCloseButton: true,
+                autoClose: 5000,
+                message: `Archived ${response.success_count || 0} students.`,
+                color: "green",
+            });
+            clearSelection();
+            setModalOpened(false);
+            await loadArchiveRecords();
+        } catch (error) {
+            showNotification({
+                icon: xIcon,
+                title: "Archive Failed",
+                position: "top-center",
+                withCloseButton: true,
+                autoClose: 5000,
+                message: error.response?.data?.error || "Failed to archive selected students.",
+                color: "red",
+            });
+        } finally {
+            setSubmittingArchive(false);
+        }
     };
 
     return (
@@ -254,7 +348,6 @@ const ArchiveStudentPage = () => {
                     <Tabs.List grow mb="lg">
                         <Tabs.Tab value="archive">ARCHIVE</Tabs.Tab>
                         <Tabs.Tab value="archived">ARCHIVED</Tabs.Tab>
-                        <Tabs.Tab value="alumnis">ALUMNIS</Tabs.Tab>
                     </Tabs.List>
 
                     <Tabs.Panel value="archive">
@@ -273,7 +366,7 @@ const ArchiveStudentPage = () => {
                                         placeholder={`Filter by ${key}`}
                                         value={filters[key]}
                                         onChange={(value) => setFilters((prev) => ({ ...prev, [key]: value }))}
-                                        data={extractUnique(STATIC_STUDENTS, key)}
+                                        data={extractUnique(archiveCandidates, key)}
                                         radius="md"
                                         searchable
                                         clearable
@@ -289,46 +382,81 @@ const ArchiveStudentPage = () => {
 
                         <ScrollArea h={400}>
                             <Grid>
-                                {filteredData.map((student) => (
-                                    <Grid.Col span={12} key={student.username}>
-                                        <InfoCard
-                                            person={student}
-                                            selectable
-                                            selected={isSelected(student.username)}
-                                            onSelectChange={toggleSelect}
-                                        />
+                                {(loadingStudents || loadingRecords) ? (
+                                    <Grid.Col span={12}>
+                                        <Center py="xl">
+                                            <Loader />
+                                        </Center>
                                     </Grid.Col>
-                                ))}
+                                ) : filteredData.length === 0 ? (
+                                    <Grid.Col span={12}>
+                                        <Center py="xl">
+                                            <Text c="dimmed">No students available for archiving.</Text>
+                                        </Center>
+                                    </Grid.Col>
+                                ) : (
+                                    filteredData.map((student) => (
+                                        <Grid.Col span={12} key={student.username}>
+                                            <InfoCard
+                                                person={student}
+                                                selectable
+                                                selected={isSelected(student.username)}
+                                                onSelectChange={toggleSelect}
+                                            />
+                                        </Grid.Col>
+                                    ))
+                                )}
                             </Grid>
                         </ScrollArea>
 
                         {selectedUsernames.length > 0 && (
                             <Group mt="lg" position="right">
-                                <Button color="blue" onClick={() => handleAction("archived")}>Archive</Button>
-                                <Button color="teal" onClick={() => handleAction("alumni")}>Alumni</Button>
+                                <Button color="blue" onClick={handleArchiveAction}>Archive</Button>
                             </Group>
                         )}
                     </Tabs.Panel>
 
                     <Tabs.Panel value="archived">
                         <Title order={3} mb="md">Recently Archived</Title>
+                        <TextInput
+                            mb="md"
+                            placeholder="Search archived students by username or name"
+                            radius="md"
+                            value={archivedSearchQuery}
+                            onChange={(event) => setArchivedSearchQuery(event.currentTarget.value)}
+                        />
                         <Grid>
-                            {STATIC_STUDENTS.slice(0, 2).map((s) => (
-                                <Grid.Col span={12} key={s.username}>
-                                    <InfoCard person={s} />
+                            {loadingRecords ? (
+                                <Grid.Col span={12}>
+                                    <Center py="xl">
+                                        <Loader />
+                                    </Center>
                                 </Grid.Col>
-                            ))}
-                        </Grid>
-                    </Tabs.Panel>
-
-                    <Tabs.Panel value="alumnis">
-                        <Title order={3} mb="md">Recent Alumnis</Title>
-                        <Grid>
-                            {STATIC_STUDENTS.slice(2, 4).map((s) => (
-                                <Grid.Col span={12} key={s.username}>
-                                    <InfoCard person={s} />
+                            ) : filteredArchivedStudents.length === 0 ? (
+                                <Grid.Col span={12}>
+                                    <Center py="xl">
+                                        <Text c="dimmed">No archived students found.</Text>
+                                    </Center>
                                 </Grid.Col>
-                            ))}
+                            ) : (
+                                filteredArchivedStudents.map((s) => (
+                                    <Grid.Col span={12} key={`${s.student_username}-${s.archived_at}`}>
+                                        <InfoCard
+                                            person={{
+                                                username: s.student_username,
+                                                full_name: s.full_name,
+                                                programme: s.programme,
+                                                discipline: s.discipline,
+                                                batch: s.batch,
+                                            }}
+                                            onClick={() => handleOpenArchivedViewer(s.student_username)}
+                                            showUnarchive
+                                            onUnarchive={openUnarchiveModal}
+                                            unarchiveLoading={unarchivingUsername === s.student_username}
+                                        />
+                                    </Grid.Col>
+                                ))
+                            )}
                         </Grid>
                     </Tabs.Panel>
                 </Tabs>
@@ -337,12 +465,66 @@ const ArchiveStudentPage = () => {
             <Modal
                 opened={modalOpened}
                 onClose={() => setModalOpened(false)}
-                title={`Confirm Marking as ${actionType.toUpperCase()}`}
+                title="Confirm Archive"
             >
-                <Text size="sm">Are you sure you want to mark the selected students as {actionType}?</Text>
+                <Text size="sm">Are you sure you want to archive the selected students?</Text>
                 <Group mt="md" position="right">
-                    <Button variant="light" onClick={() => setModalOpened(false)}>Cancel</Button>
-                    <Button color="blue" onClick={confirmAction}>Confirm</Button>
+                    <Button variant="light" onClick={() => setModalOpened(false)} disabled={submittingArchive}>Cancel</Button>
+                    <Button color="blue" onClick={confirmAction} loading={submittingArchive}>Confirm</Button>
+                </Group>
+            </Modal>
+
+            <Modal
+                opened={viewerModalOpened}
+                onClose={() => setViewerModalOpened(false)}
+                title={`Archived Data: ${viewerUsername}`}
+                size="lg"
+                centered
+            >
+                {viewerLoading ? (
+                    <Center py="xl">
+                        <Loader />
+                    </Center>
+                ) : viewerData ? (
+                    <Grid>
+                        {Object.entries(viewerData).map(([field, value]) => (
+                            <Grid.Col span={6} key={field}>
+                                <Paper withBorder p="sm" radius="md">
+                                    <Text size="xs" c="dimmed">{field}</Text>
+                                    <Text fw={500}>{value === null || value === "" ? "N/A" : String(value)}</Text>
+                                </Paper>
+                            </Grid.Col>
+                        ))}
+                    </Grid>
+                ) : (
+                    <Text c="dimmed">No archive data found.</Text>
+                )}
+            </Modal>
+
+            <Modal
+                opened={unarchiveModalOpened}
+                onClose={() => setUnarchiveModalOpened(false)}
+                title="Confirm Unarchive"
+                centered
+            >
+                <Text size="sm">
+                    Are you sure you want to unarchive {unarchiveTargetUsername || "this student"}?
+                </Text>
+                <Group mt="md" position="right">
+                    <Button
+                        variant="light"
+                        onClick={() => setUnarchiveModalOpened(false)}
+                        disabled={!!unarchivingUsername}
+                    >
+                        Cancel
+                    </Button>
+                    <Button
+                        color="red"
+                        onClick={confirmUnarchive}
+                        loading={!!unarchivingUsername}
+                    >
+                        Confirm Unarchive
+                    </Button>
                 </Group>
             </Modal>
         </Container>

@@ -1,0 +1,83 @@
+html,
+body,
+#root {
+	margin: 0;
+	min-height: 100%;
+}
+
+body {
+	transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+[data-mantine-color-scheme="dark"] body {
+	background-color: #0b1220;
+	color: #e6edf7;
+}
+
+[data-mantine-color-scheme="dark"] .app-shell,
+[data-mantine-color-scheme="dark"] .app-content {
+	background-color: #0b1220;
+}
+
+[data-mantine-color-scheme="dark"] .mantine-Paper-root,
+[data-mantine-color-scheme="dark"] .mantine-Card-root,
+[data-mantine-color-scheme="dark"] .mantine-Modal-content,
+[data-mantine-color-scheme="dark"] .mantine-Modal-header,
+[data-mantine-color-scheme="dark"] .mantine-Menu-dropdown,
+[data-mantine-color-scheme="dark"] .mantine-Popover-dropdown,
+[data-mantine-color-scheme="dark"] .mantine-Tabs-panel,
+[data-mantine-color-scheme="dark"] .mantine-Tabs-list,
+[data-mantine-color-scheme="dark"] .mantine-TableTable {
+	background-color: #111a2b;
+	border-color: #23344f;
+}
+
+[data-mantine-color-scheme="dark"] .mantine-Table-th,
+[data-mantine-color-scheme="dark"] .mantine-Table-td,
+[data-mantine-color-scheme="dark"] th,
+[data-mantine-color-scheme="dark"] td {
+	border-color: #23344f;
+	color: #e6edf7;
+}
+
+[data-mantine-color-scheme="dark"] .mantine-Input-input,
+[data-mantine-color-scheme="dark"] .mantine-Input-wrapper input,
+[data-mantine-color-scheme="dark"] .mantine-Input-wrapper textarea,
+[data-mantine-color-scheme="dark"] .mantine-Select-input,
+[data-mantine-color-scheme="dark"] .mantine-MultiSelect-input,
+[data-mantine-color-scheme="dark"] .mantine-PillsInput-input,
+[data-mantine-color-scheme="dark"] .mantine-Input-input::placeholder,
+[data-mantine-color-scheme="dark"] .mantine-MultiSelect-input::placeholder {
+	background-color: #0f1728;
+	color: #d7e3f4;
+	border-color: #2a3f5f;
+}
+
+[data-mantine-color-scheme="dark"] .mantine-InputLabel-root,
+[data-mantine-color-scheme="dark"] .mantine-Text-root,
+[data-mantine-color-scheme="dark"] .mantine-Title-root {
+	color: #e6edf7;
+}
+
+[data-mantine-color-scheme="dark"] [style*="background-color: white"],
+[data-mantine-color-scheme="dark"] [style*="background-color: #fff"],
+[data-mantine-color-scheme="dark"] [style*="background-color: #fdfdfd"],
+[data-mantine-color-scheme="dark"] [style*="background-color: #f8f9fa"],
+[data-mantine-color-scheme="dark"] [style*="background: white"],
+[data-mantine-color-scheme="dark"] [style*="background: #f7f7f7"],
+[data-mantine-color-scheme="dark"] [style*="background-color: rgb(255, 255, 255)"],
+[data-mantine-color-scheme="dark"] [style*="background-color: rgb(248, 249, 250)"],
+[data-mantine-color-scheme="dark"] [style*="background-color: rgb(253, 253, 253)"] {
+	background-color: #111a2b !important;
+	color: #e6edf7 !important;
+}
+
+[data-mantine-color-scheme="dark"] [style*="background-color: #f0f0f0"],
+[data-mantine-color-scheme="dark"] [style*="background-color: rgb(240, 240, 240)"] {
+	background-color: #182338 !important;
+	color: #e6edf7 !important;
+}
+
+[data-mantine-color-scheme="dark"] .info-card {
+	border-color: #2a3f5f !important;
+}

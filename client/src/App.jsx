@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   BrowserRouter as Router,
   Routes,
@@ -32,9 +32,10 @@ import LoginPage from "./pages/Login/LoginPage.jsx";
 import Sidebar from "./components/Sidebar/Sidebar.jsx";
 import { Notifications } from "@mantine/notifications";
 
-function Layout() {
+function Layout({ colorScheme, onToggleTheme }) {
   return (
     <div
+      className="app-shell"
       style={{
         display: "flex",
         height: "100vh",
@@ -42,8 +43,11 @@ function Layout() {
         overflow: "hidden",
       }}
     >
-      <Sidebar />
-      <div style={{ flex: 1, overflowY: "auto", paddingRight: "80px" }}>
+      <Sidebar colorScheme={colorScheme} onToggleTheme={onToggleTheme} />
+      <div
+        className="app-content"
+        style={{ flex: 1, overflowY: "auto", paddingRight: "80px" }}
+      >
         <Routes>
           <Route
             path="/UserDirectory"
@@ -156,8 +160,29 @@ function Layout() {
 }
 
 function App() {
+  const [colorScheme, setColorScheme] = useState(() => {
+    const stored = localStorage.getItem("fusion-color-scheme");
+    return stored === "light" ? "light" : "dark";
+  });
+
+  useEffect(() => {
+    localStorage.setItem("fusion-color-scheme", colorScheme);
+  }, [colorScheme]);
+
+  const toggleTheme = () => {
+    setColorScheme((current) => (current === "dark" ? "light" : "dark"));
+  };
+
   return (
-    <MantineProvider withGlobalStyles withNormalizeCSS>
+    <MantineProvider
+      withGlobalStyles
+      withNormalizeCSS
+      forceColorScheme={colorScheme}
+      theme={{
+        primaryColor: "blue",
+        defaultRadius: "md",
+      }}
+    >
       <Notifications />
       <AuthProvider>
         <Router>
@@ -169,7 +194,12 @@ function App() {
             <Route path="/" element={<Navigate to="/login" />} />
 
             {/* Other protected routes */}
-            <Route path="/*" element={<Layout />} />
+            <Route
+              path="/*"
+              element={
+                <Layout colorScheme={colorScheme} onToggleTheme={toggleTheme} />
+              }
+            />
           </Routes>
         </Router>
       </AuthProvider>

@@ -16,6 +16,8 @@ import {
   FaArchive as FaArchiveIcon,
   FaHdd,
   FaClock,
+  FaMoon,
+  FaSun,
 } from "react-icons/fa";
 import { Tooltip, Flex, Modal, Button } from "@mantine/core";
 import { useAuth } from "../../context/AuthContext";
@@ -25,13 +27,21 @@ const MANTINE_DARK_BLUE = "#1c7ed6";
 const LOGOUT_RED = "#d63031";
 const LOGOUT_DARK_RED = "#b71c1c";
 
-const Sidebar = () => {
+const Sidebar = ({ colorScheme, onToggleTheme }) => {
   const navigate = useNavigate();
   const isSmallScreen = useMediaQuery("(max-width: 768px)");
   const [hovered, setHovered] = useState(null);
   const [logoutConfirm, setLogoutConfirm] = useState(false);
 
   const { logout } = useAuth();
+
+  const isDark = colorScheme === "dark";
+  const sidebarBg = isDark ? "#111827" : "#ffffff";
+  const sidebarShadow = isDark
+    ? "-3px 0 16px rgba(0, 0, 0, 0.45)"
+    : "-3px 0 10px rgba(0, 0, 0, 0.1)";
+  const idleIconColor = isDark ? "#74c0fc" : MANTINE_BLUE;
+  const submenuBg = isDark ? "#1864ab" : MANTINE_DARK_BLUE;
 
   const handleLogout = () => {
     logout();
@@ -52,6 +62,13 @@ const Sidebar = () => {
       height: "10%",
       isPrimary: true,
       action: () => navigate("/UserDirectory"),
+    },
+    {
+      label: isDark ? "Light Mode" : "Dark Mode",
+      icon: isDark ? <FaSun size={22} /> : <FaMoon size={22} />,
+      height: "10%",
+      isTheme: true,
+      action: onToggleTheme,
     },
     {
       label: "User Management",
@@ -149,8 +166,8 @@ const Sidebar = () => {
           top: 0,
           height: "100vh",
           width: isSmallScreen ? "60px" : "80px",
-          backgroundColor: "#ffffff",
-          boxShadow: "-3px 0 10px rgba(0, 0, 0, 0.1)",
+          backgroundColor: sidebarBg,
+          boxShadow: sidebarShadow,
         }}
       >
         {menuItems.map(
@@ -164,6 +181,7 @@ const Sidebar = () => {
             height,
             isDashboard,
             isLogout,
+            isTheme,
             action,
           }) => (
             <div
@@ -184,9 +202,13 @@ const Sidebar = () => {
                       ? hovered === label
                         ? LOGOUT_DARK_RED
                         : LOGOUT_RED
-                      : hovered === menuKey || hovered === label
-                        ? MANTINE_BLUE
-                        : "transparent",
+                      : isTheme
+                        ? hovered === label
+                          ? "#f59f00"
+                          : "#fab005"
+                        : hovered === menuKey || hovered === label
+                          ? MANTINE_BLUE
+                          : "transparent",
                 transition: "background 0.3s ease-in-out",
                 cursor: "pointer",
                 color:
@@ -194,9 +216,10 @@ const Sidebar = () => {
                   hovered === menuKey ||
                   hovered === label ||
                   isLogout ||
-                  isPrimary
+                  isPrimary ||
+                  isTheme
                     ? "white"
-                    : MANTINE_BLUE,
+                    : idleIconColor,
               }}
               onMouseEnter={() => setHovered(menuKey || label)}
               onMouseLeave={() => setHovered(null)}
@@ -209,12 +232,7 @@ const Sidebar = () => {
                   style={{ width: "100%", height: "100%" }}
                 >
                   {subItems.map(({ label, path, icon }) => (
-                    <Tooltip
-                      key={label}
-                      label={label}
-                      position="left"
-                      withArrow
-                    >
+                    <Tooltip key={label} label={label} position="left" withArrow>
                       <div
                         style={{
                           flex: 1,
@@ -222,7 +240,7 @@ const Sidebar = () => {
                           display: "flex",
                           alignItems: "center",
                           justifyContent: "center",
-                          backgroundColor: MANTINE_DARK_BLUE,
+                          backgroundColor: submenuBg,
                           transition: "background 0.3s ease-in-out",
                           color: "white",
                         }}
@@ -230,7 +248,7 @@ const Sidebar = () => {
                           (e.currentTarget.style.background = MANTINE_BLUE)
                         }
                         onMouseLeave={(e) =>
-                          (e.currentTarget.style.background = MANTINE_DARK_BLUE)
+                          (e.currentTarget.style.background = submenuBg)
                         }
                         onClick={() => navigate(path)}
                       >

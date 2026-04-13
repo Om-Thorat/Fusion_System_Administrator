@@ -1,5 +1,7 @@
 import csv
 import datetime
+import json
+import os
 from django.http import HttpResponse
 from django.db.models import Max, Q
 from django.db.models.functions import Upper
@@ -9,10 +11,11 @@ from rest_framework.response import Response
 from rest_framework.decorators import api_view
 from rest_framework import status
 from rest_framework.views import APIView
-from .models import GlobalsDesignation, GlobalsHoldsdesignation, GlobalsModuleaccess, AuthUser, Batch, Student, GlobalsDepartmentinfo, Programme, GlobalsFaculty, Staff
+from .models import ArchiveRecord, GlobalsDesignation, GlobalsHoldsdesignation, GlobalsModuleaccess, AuthUser, Batch, Student, GlobalsDepartmentinfo, Programme, GlobalsFaculty, Staff
 from .serializers import GlobalExtraInfoSerializer, GlobalsDesignationSerializer, GlobalsModuleaccessSerializer, AuthUserSerializer, GlobalsHoldsDesignationSerializer, StudentSerializer, GlobalsFacultySerializer, GlobalsDepartmentinfoSerializer, BatchSerializer, ProgrammeSerializer, StaffSerializer, ViewStudentsWithFiltersSerializer, ViewStaffWithFiltersSerializer, ViewFacultyWithFiltersSerializer
 from io import StringIO
 from .helpers import create_password, send_email, mail_to_user, configure_password_mail, add_user_extra_info, add_user_designation_info, add_student_info
+from .archiver import archive_student
 from django.contrib.auth.hashers import make_password
 from backend.settings import EMAIL_TEST_ARRAY
 from django.conf import settings
@@ -718,3 +721,182 @@ class UserListView(APIView):
             return Response({"error": "Invalid or missing user type."}, status=status.HTTP_400_BAD_REQUEST)
 
         return Response(serializer.data)
+
+
+@api_view(["POST"])
+def archive_student_view(request):
+    username = request.data.get("username")
+    archive_type = request.data.get("archive_type")
+    archived_by = request.data.get("archived_by")
+
+    if not username or not archive_type or not archived_by:
+        return Response(
+            {
+                "error": "username, archive_type and archived_by are required.",
+            },
+            status=status.HTTP_400_BAD_REQUEST,
+        )
+
+    try:
+        file_path = archive_student(username, archive_type, archived_by)
+        return Response(
+            {
+                "message": "Student archived successfully.",
+                "username": username,
+                "archive_type": archive_type,
+                "file_path": file_path,
+            },
+            status=status.HTTP_201_CREATED,
+        )
+    except Student.DoesNotExist:
+        return Response({"error": "Student not found."}, status=status.HTTP_404_NOT_FOUND)
+    except ValueError as exc:
+        return Response({"error": str(exc)}, status=status.HTTP_400_BAD_REQUEST)
+    except Exception as exc:
+        return Response(
+            {"error": f"Failed to archive student: {exc}"},
+            status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+        )
+
+
+@api_view(["POST"])
+def bulk_archive_view(request):
+    usernames = request.data.get("usernames")
+    archive_type = request.data.get("archive_type")
+    archived_by = request.data.get("archived_by")
+
+    if not isinstance(usernames, list) or len(usernames) == 0:
+        return Response(
+            {"error": "usernames must be a non-empty list."},
+            status=status.HTTP_400_BAD_REQUEST,
+        )
+
+    if not archive_type or not archived_by:
+        return Response(
+            {"error": "archive_type and archived_by are required."},
+            status=status.HTTP_400_BAD_REQUEST,
+        )
+
+    archived = []
+    failed = []
+
+    for username in usernames:
+        try:
+            file_path = archive_student(username, archive_type, archived_by)
+            archived.append({"username": username, "file_path": file_path})
+        except Exception as exc:
+            failed.append({"username": username, "error": str(exc)})
+
+    response_status = (
+        status.HTTP_200_OK if len(failed) == 0 else status.HTTP_207_MULTI_STATUS
+    )
+    return Response(
+        {
+            "message": "Bulk archive process completed.",
+            "archive_type": archive_type,
+            "success_count": len(archived),
+            "failure_count": len(failed),
+            "archived": archived,
+            "failed": failed,
+        },
+        status=response_status,
+    )
+
+
+@api_view(["GET"])
+def get_archive_records(request):
+    records = ArchiveRecord.objects.all().values(
+        "id",
+        "student_username",
+        "full_name",
+        "programme",
+        "discipline",
+        "batch",
+        "archive_type",
+        "archived_at",
+        "json_file_path",
+        "archived_by",
+    )
+    return Response(list(records), status=status.HTTP_200_OK)
+
+
+@api_view(["GET"])
+def view_archive(request, username):
+    record = (
+        ArchiveRecord.objects.filter(student_username__iexact=username)
+        .order_by("-archived_at")
+        .first()
+    )
+    if not record:
+        return Response(
+            {"error": "Archive record not found for this username."},
+            status=status.HTTP_404_NOT_FOUND,
+        )
+
+    try:
+        with open(record.json_file_path, "r", encoding="utf-8") as archive_file:
+            archive_data = json.load(archive_file)
+    except FileNotFoundError:
+        return Response(
+            {"error": "Archive file not found on disk."},
+            status=status.HTTP_404_NOT_FOUND,
+        )
+    except Exception as exc:
+        return Response(
+            {"error": f"Unable to read archive file: {exc}"},
+            status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+        )
+
+    return Response(
+        {
+            "record": {
+                "id": record.id,
+                "student_username": record.student_username,
+                "archive_type": record.archive_type,
+                "archived_at": record.archived_at,
+                "archived_by": record.archived_by,
+                "json_file_path": record.json_file_path,
+            },
+            "data": archive_data,
+        },
+        status=status.HTTP_200_OK,
+    )
+
+
+@api_view(["POST"])
+def unarchive_student_view(request):
+    username = request.data.get("username")
+    if not username:
+        return Response(
+            {"error": "username is required."},
+            status=status.HTTP_400_BAD_REQUEST,
+        )
+
+    records_qs = ArchiveRecord.objects.filter(student_username__iexact=username)
+    records = list(records_qs)
+    if not records:
+        return Response(
+            {"error": "No archive records found for this username."},
+            status=status.HTTP_404_NOT_FOUND,
+        )
+
+    file_paths = {record.json_file_path for record in records if record.json_file_path}
+    deleted_count = len(records)
+    records_qs.delete()
+
+    for file_path in file_paths:
+        try:
+            if os.path.exists(file_path):
+                os.remove(file_path)
+        except OSError:
+            # Keep unarchive successful even if file cleanup fails.
+            pass
+
+    return Response(
+        {
+            "message": "Student unarchived successfully.",
+            "username": username,
+            "deleted_records": deleted_count,
+        },
+        status=status.HTTP_200_OK,
+    )

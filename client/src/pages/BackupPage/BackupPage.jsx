@@ -21,6 +21,7 @@ import {
   ThemeIcon,
   Alert,
 } from "@mantine/core";
+import { useMantineColorScheme } from "@mantine/core";
 import {
   FaTrash,
   FaUpload,
@@ -183,6 +184,9 @@ const BackupHeatmap = ({ backups }) => {
 // ── main page ──────────────────────────────────────────────────────────────────
 
 const BackupPage = () => {
+  const { colorScheme } = useMantineColorScheme();
+  const isDark = colorScheme === "dark";
+
   const [databases, setDatabases] = useState([]);
   const [selectedDb, setSelectedDb] = useState(null);
   const [backups, setBackups] = useState([]);
@@ -480,8 +484,8 @@ const BackupPage = () => {
       {/* Header */}
       <Flex align="center" justify="space-between" mb="xl" wrap="wrap" gap="md">
         <Flex align="center" gap="sm">
-          <FaDatabase size={28} color="#228be6" />
-          <Title order={2} style={{ color: "#1c7ed6" }}>
+          <FaDatabase size={28} color={isDark ? "#74c0fc" : "#228be6"} />
+          <Title order={2} style={{ color: isDark ? "#a5d8ff" : "#1c7ed6" }}>
             Database Backups
           </Title>
         </Flex>
@@ -518,11 +522,15 @@ const BackupPage = () => {
                 cursor: "pointer",
                 borderColor:
                   selectedDb === db.id
-                    ? "#228be6"
+                    ? isDark
+                      ? "#4dabf7"
+                      : "#228be6"
                     : "var(--mantine-color-gray-3)",
                 backgroundColor:
                   selectedDb === db.id
-                    ? "var(--mantine-color-blue-0)"
+                    ? isDark
+                      ? "#10223c"
+                      : "var(--mantine-color-blue-0)"
                     : undefined,
                 transition: "all 0.2s",
               }}
@@ -615,7 +623,7 @@ const BackupPage = () => {
                       width: 12,
                       height: 12,
                       borderRadius: 2,
-                      backgroundColor: "#343a40",
+                      backgroundColor: isDark ? "#5c677d" : "#343a40",
                     }}
                   />
                   <Text size="xs" color="dimmed">

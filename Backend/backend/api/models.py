@@ -246,6 +246,31 @@ class GlobalsFaculty(models.Model):
         db_table = "globals_faculty"
 
 
+class ArchiveRecord(models.Model):
+    ARCHIVE_TYPE_CHOICES = [
+        ("archived", "Archived"),
+        ("alumni", "Alumni"),
+    ]
+
+    student_username = models.CharField(max_length=150)
+    full_name = models.CharField(max_length=255)
+    programme = models.CharField(max_length=100)
+    discipline = models.CharField(max_length=100)
+    batch = models.IntegerField()
+    archive_type = models.CharField(max_length=20, choices=ARCHIVE_TYPE_CHOICES)
+    archived_at = models.DateTimeField(auto_now_add=True)
+    json_file_path = models.CharField(max_length=500)
+    archived_by = models.CharField(max_length=150)
+
+    class Meta:
+        managed = True
+        db_table = "archive_records"
+        ordering = ["-archived_at"]
+
+    def __str__(self):
+        return f"{self.student_username} ({self.archive_type})"
+
+
 class BackupRecord(models.Model):
     STATUS_CHOICES = [
         ("in_progress", "In Progress"),

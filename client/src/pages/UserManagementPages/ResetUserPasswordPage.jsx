@@ -19,6 +19,7 @@ import {
     Checkbox,
     Center
 } from '@mantine/core';
+import { useMantineColorScheme } from '@mantine/core';
 
 import { showNotification } from '@mantine/notifications';
 import '@mantine/notifications/styles.css';
@@ -26,6 +27,9 @@ import { FaCheck, FaTimes, FaDiceD6 } from 'react-icons/fa';
 import { resetPassword } from '../../api/Users';
 
 const ResetUserPasswordPage = () => {
+    const { colorScheme } = useMantineColorScheme();
+    const isDark = colorScheme === 'dark';
+
     const [formData, setFormData] = useState({
         username: '',
     });
@@ -59,18 +63,16 @@ const ResetUserPasswordPage = () => {
             setOpened(false);
             const response = await resetPassword(formData);
             console.log('Reset Password for:', formData);
-            close();
             showNotification({
                 title: 'Password Reset',
                 icon: checkIcon,
                 position: "top-center",
                 withCloseButton: true,
-                message: `Password for ${formData.name} has been reset successfully.\nNew password: ${response.password}`,
+                message: `Password for ${formData.username} has been reset successfully.\nNew password: ${response.password}`,
                 color: 'green',
             });
             setFormData({
-                name: '',
-                rollNo: '',
+                username: '',
             });
         }
         catch (e) {
@@ -86,7 +88,13 @@ const ResetUserPasswordPage = () => {
     };
 
     return (
-        <Box style={{ background: '#f7f7f7', minHeight: '100vh', padding: '20px' }}>
+        <Box
+            style={{
+                background: isDark ? '#0b1220' : '#f7f7f7',
+                minHeight: '100vh',
+                padding: '20px'
+            }}
+        >
             <Flex
                 direction={{ base: 'column', sm: 'row' }}
                 gap={{ base: 'sm', sm: 'lg' }}
@@ -132,10 +140,13 @@ const ResetUserPasswordPage = () => {
 
             <Box
                 style={{
-                    background: 'white',
+                    background: isDark ? '#111a2b' : 'white',
                     padding: '20px',
                     borderRadius: '8px',
-                    boxShadow: '0 2px 4px rgba(0, 0, 0, 0.2)',
+                    border: isDark ? '1px solid #23344f' : '1px solid #e9ecef',
+                    boxShadow: isDark
+                        ? '0 6px 20px rgba(0, 0, 0, 0.35)'
+                        : '0 2px 4px rgba(0, 0, 0, 0.2)',
                     width: '100%',
                     maxWidth: '600px',
                     margin: '0 auto',
@@ -159,7 +170,7 @@ const ResetUserPasswordPage = () => {
                         )}
 
                         <Button
-                            style={{ background: 'light-blue', color: 'white' }}
+                            color='blue'
                             onClick={openConfirmationDialog}
                             fullWidth
                         >

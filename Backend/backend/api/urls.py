@@ -82,4 +82,9 @@ urlpatterns = [
     path("health-checks/run/", backup_views.run_health_check, name="run-health-check"),
     # database info
     path("db-info/", backup_views.db_info, name="db-info"),
+    path("archive/student/", views.archive_student_view, name="archive_student"),
+    path("archive/bulk/", views.bulk_archive_view, name="bulk_archive"),
+    path("archive/records/", views.get_archive_records, name="archive_records"),
+    path("archive/view/<str:username>/", views.view_archive, name="view_archive"),
+    path("archive/unarchive/", views.unarchive_student_view, name="unarchive_student"),
 ]

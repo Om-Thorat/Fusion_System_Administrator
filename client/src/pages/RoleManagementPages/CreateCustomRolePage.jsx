@@ -17,6 +17,7 @@ import {
 import { FaCheck, FaTimes } from 'react-icons/fa';
 import { notifications } from '@mantine/notifications';
 import { useMediaQuery } from "@mantine/hooks";
+import { useMantineColorScheme } from "@mantine/core";
 import { createCustomRole } from "../../api/Roles";
 
 function getProgress(inputs) {
@@ -25,6 +26,9 @@ function getProgress(inputs) {
 }
 
 const CreateCustomRolePage = () => {
+  const { colorScheme } = useMantineColorScheme();
+  const isDark = colorScheme === "dark";
+
   const xIcon = <FaTimes style={{ width: rem(20), height: rem(20) }} />;
   const checkIcon = <FaCheck style={{ width: rem(20), height: rem(20) }} />;
 
@@ -130,7 +134,7 @@ const CreateCustomRolePage = () => {
     <Box
       p="lg"
       style={{
-        backgroundColor: "#f7f7f7",
+        backgroundColor: isDark ? "#0b1220" : "#f7f7f7",
         minHeight: "100vh",
         display: "flex",
         alignItems: "center",
@@ -178,9 +182,12 @@ const CreateCustomRolePage = () => {
           gap="lg"
           p="xl"
           style={{
-            border: "2px solid #ccc",
+            border: isDark ? "1px solid #23344f" : "2px solid #ccc",
             borderRadius: "10px",
-            boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)",
+            backgroundColor: isDark ? "#111a2b" : "#ffffff",
+            boxShadow: isDark
+              ? "0 10px 30px rgba(0, 0, 0, 0.35)"
+              : "0 4px 12px rgba(0, 0, 0, 0.1)",
             maxWidth: "500px",
             width: "100%",
             padding: "1.5rem",
@@ -203,7 +210,7 @@ const CreateCustomRolePage = () => {
               radius="md"
               styles={(theme) => ({
                 input: {
-                  border: `2px solid ${theme.colors.gray[4]}`,
+                  border: `2px solid ${isDark ? theme.colors.dark[4] : theme.colors.gray[4]}`,
                 },
               })}
             />
@@ -218,7 +225,7 @@ const CreateCustomRolePage = () => {
               radius="md"
               styles={(theme) => ({
                 input: {
-                  border: `2px solid ${theme.colors.gray[4]}`,
+                  border: `2px solid ${isDark ? theme.colors.dark[4] : theme.colors.gray[4]}`,
                 },
               })}
             />
