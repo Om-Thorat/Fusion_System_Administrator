@@ -1,4 +1,4 @@
-/* eslint-disable react/prop-types */
+﻿/* eslint-disable react/prop-types */
 import React, { useState, useEffect, useCallback, useRef } from "react";
 import {
   Box,
@@ -664,8 +664,8 @@ const BackupPage = () => {
                 No restores performed yet.
               </Text>
             ) : (
-              <ScrollArea mah={280}>
-                <Timeline active={-1} bulletSize={28} lineWidth={2}>
+              <ScrollArea h={300} type="always" offsetScrollbars>
+                  <Timeline active={-1} bulletSize={28} lineWidth={2} pb="xl" pt="md" px="md">
                   {restores.map((r) => {
                     const isOk = r.status === "success";
                     const isFail = r.status === "failed";
